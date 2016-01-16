@@ -182,12 +182,12 @@ public class Particle3D  {
     public static double potEnergy(Particle3D p1, Particle3D p2) {
 	return -p1.getMass()*p2.getMass()/pSep(p1,p2).magSq();  }
 
-    /** Total energy of Particle3D
+    /** Total energy of two Particle3D
      * as a sum of kinetic and potential energies
      *
      * @param p1 a Particle3D representing first particle
      * @param p2 a particle3D representing second particle
-     * @return double representing total energy of p1
+     * @return double representing total energy of p1 and p2
      */
     public static double totEnergy(Particle3D p1, Particle3D p2) {
 	return kEnergy(p1) + kEnergy(p2) + potEnergy(p1, p2); }
