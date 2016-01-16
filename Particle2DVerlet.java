@@ -41,6 +41,7 @@ public class Particle2DVerlet {
 	 * Start of the Verlet algorithm
 	 */
 
+
 	// Prints the intial position to file
 	//		output.printf("%s %s\n", Orbital.getPosition().getX(), Orbital.getPosition().getY());
 

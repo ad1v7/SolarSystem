@@ -1,7 +1,5 @@
-Robert
 import java.util.Scanner;
 import java.io.*;
-// Marcin
 /**
  * A class for particle in 3D space, complete with constructors
  * setters and getters
@@ -120,19 +118,7 @@ public class Particle3D  {
      * Instance Methods
      */
     
-    /** Returns the kinetic energy of a Particle3D,
-     * calculated as 1/2*m*v^2.
-     *
-     * @return a double that is the kinetic energy.
-     */
-    public double kEnergy() { return 0.5*mass*velocity.mag()*velocity.mag(); }
 
-    /** Time integration support: evolve the velocity
-     * according to dv = f/m * dt.
-     *
-     * @param dt a Double that is the timestep.
-     * @param force a Vector3D that is the current force on the particle.
-     */
     public void leapVelocity(double dt, Vector3D force) {
 	velocity = Vector3D.vecAdd(velocity,force.scalMul(dt/mass));
     }
@@ -173,6 +159,23 @@ public class Particle3D  {
     public static Vector3D pSep(Particle3D p1, Particle3D p2) {
 	return Vector3D.vecSub(p1.getPosition(),p2.getPosition());
     }
+
+    /** The kinetic energy of a Particle3D,
+     * calculated as 1/2*m*v^2.
+     *
+     * @param p a Particle3D
+     * @return a double that is the kinetic energy.
+     */
+
+    public static double kEnergy(Particle3D p) { return 0.5*p.getMass()*p.getVelocity().mag()*p.getVelocity().mag(); }
+
+    /** Time integration support: evolve the velocity
+     * according to dv = f/m * dt.
+     *
+     * @param dt a Double that is the timestep.
+     * @param force a Vector3D that is the current force on the particle.
+     */
+
 
     /** The potential energy of two Particle3D
      * calculated as -m_1*m*2/r
