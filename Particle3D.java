@@ -1,5 +1,6 @@
 import java.util.Scanner;
 import java.io.*;
+// Marcin
 /**
  * A class for particle in 3D space, complete with constructors
  * setters and getters
