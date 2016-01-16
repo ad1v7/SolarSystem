@@ -190,7 +190,7 @@ public class Particle3D  {
      * @return double representing total energy of p1
      */
     public static double totEnergy(Particle3D p1, Particle3D p2) {
-	return p1.kEnergy() + potEnergy(p1, p2); }
+	return p1.kEnergy() + p2.kEnergy() + potEnergy(p1, p2); }
 
 
     /** A method to read a particle from a file
