@@ -25,10 +25,10 @@ public class Particle3D  {
     /** Default constructor. Constructs a new uninitialised Particle3D. 
      */   
     public Particle3D() {
-        this.setMass(Double.NaN);
-        this.setPosition(new Vector3D(Double.NaN,Double.NaN,Double.NaN));
-        this.setVelocity(new Vector3D(Double.NaN,Double.NaN,Double.NaN));
-	this.setLabel("Uninitialized");
+        this.setMass(0.0);
+        this.setPosition(new Vector3D(0.0,0.0,0.0));
+        this.setVelocity(new Vector3D(0.0,0.0,0.0));
+	this.setLabel("null");
     }
     
     /** Explicit constructor. Constructs a new Particle3D with
