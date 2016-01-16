@@ -124,7 +124,7 @@ public class Vector3D {
 	double x = this.getX()+0.0;
 	double y = this.getY()+0.0;
 	double z = this.getZ()+0.0;
-	return "(" + x + ", " + y + ", " + z + ")";
+	return x + y + z;
     }
 
     /*
