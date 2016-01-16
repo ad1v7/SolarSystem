@@ -42,6 +42,9 @@ public class Particle2DVerlet {
 	 */
 
 	output.printf("%s %f\n", Particle3D.unitVec(Central,Orbital), Particle3D.magForce(Central,Orbital));
+	output.printf("%s %f\n", Particle3D.vecForce(Central,Orbital), Particle3D.vecForce(Central,Orbital).mag());
+	output.printf("%s %f\n", Particle3D.pSep(Central,Orbital), Particle3D.pSep(Central,Orbital).mag());
+	output.printf("%s %f\n", Particle3D.potEnergy(Central,Orbital), Particle3D.pSep(Central,Orbital).mag());
 	// Prints the intial position to file
 	//		output.printf("%s %s\n", Orbital.getPosition().getX(), Orbital.getPosition().getY());
 

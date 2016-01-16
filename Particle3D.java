@@ -117,8 +117,13 @@ public class Particle3D  {
     /*
      * Instance Methods
      */
-    
 
+    /** Time integration support: evolve the velocity
+     * according to dv = F * dt / m
+     *
+     * @param dt a double that is the timestep
+     * @param force Vector3D that is the current force on the particle.
+     */
     public void leapVelocity(double dt, Vector3D force) {
 	velocity = Vector3D.vecAdd(velocity,force.scalMul(dt/mass));
     }
@@ -136,7 +141,7 @@ public class Particle3D  {
      * according to dx = v * dt + 0.5 * a * dt**2.
      *
      * @param dt a double that is the timestep.
-     * @param force a double that is the current force.
+     * @param force a Vector3D that is the current force.
      */
     public void leapPosition(double dt, Vector3D force) {
 	// position = position + velocity * dt + 0.5 * force/mass * dt*dt;
@@ -144,13 +149,12 @@ public class Particle3D  {
 	position = Vector3D.vecAdd(position,force.scalMul(0.5/mass*dt*dt));
     } 
     
-
     /*
      * Static Methods
      *
      */
 
-    /** Relative separation between two Particle3D
+    /** separation vector between two Particle3D
      *
      * @param p1 first particle
      * @param p2 second particle
@@ -169,7 +173,6 @@ public class Particle3D  {
     public static Vector3D unitVec(Particle3D p1, Particle3D p2) {
 	return pSep(p1,p2).scalDiv(pSep(p1,p2).mag());
     }
-
 
     /** Magnitude of force between two Particle3D
      *
@@ -197,23 +200,9 @@ public class Particle3D  {
      * @param p a Particle3D
      * @return a double that is the kinetic energy.
      */
-
-    /** The kinetic energy of a Particle3D,
-     * calculated as 1/2*m*v^2.
-     *
-     * @param p a Particle3D
-     * @return a double that is the kinetic energy.
-     */
-
-    public static double kEnergy(Particle3D p) { return 0.5*p.getMass()*p.getVelocity().mag()*p.getVelocity().mag(); }
-
-    /** Time integration support: evolve the velocity
-     * according to dv = f/m * dt.
-     *
-     * @param dt a Double that is the timestep.
-     * @param force a Vector3D that is the current force on the particle.
-     */
-
+    public static double kEnergy(Particle3D p) { 
+	return 0.5*p.getMass()*p.getVelocity().mag()*p.getVelocity().mag(); 
+    }
 
     /** The potential energy of two Particle3D
      * calculated as -m_1*m*2/r
@@ -233,22 +222,23 @@ public class Particle3D  {
      * @return double representing total energy of p1 and p2
      */
     public static double totEnergy(Particle3D p1, Particle3D p2) {
-	return kEnergy(p1) + kEnergy(p2) + potEnergy(p1, p2); }
-
+	return kEnergy(p1) + kEnergy(p2) + potEnergy(p1, p2); 
+    }
 
     /** A method to read a particle from a file
      *
      * @param scan a Scanner attached to the input file
      * @return Particle3D p
      */    
-    public static Particle3D pScanner(Scanner scan) {
-	
+    public static Particle3D pScanner(Scanner scan) {	
 	Particle3D p = new Particle3D();
-	    p.setLabel(scan.next());
-	    p.setMass(scan.nextDouble());	
-	    p.setPosition(new Vector3D(scan.nextDouble(),scan.nextDouble(),scan.nextDouble()));
-	    p.setVelocity(new Vector3D(scan.nextDouble(),scan.nextDouble(),scan.nextDouble()));
-	    return p;
+	p.setLabel(scan.next());
+	p.setMass(scan.nextDouble());	
+	p.setPosition(new Vector3D
+		      (scan.nextDouble(),scan.nextDouble(),scan.nextDouble()));
+	p.setVelocity(new Vector3D
+		      (scan.nextDouble(),scan.nextDouble(),scan.nextDouble()));
+	return p;
     }
 
 }
