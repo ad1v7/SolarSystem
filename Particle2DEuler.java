@@ -41,6 +41,8 @@ public class Particle2DEuler {
 	 * Start of the symplectic Euler algorithm
 	 */
 
+	output.printf("%f\n", Particle3D.potEnergy(Central, Orbital));
+
 	// Prints the initial time and position to file
 	output.printf("%s %s\n", Orbital.getPosition().getX(), Orbital.getPosition().getY());
 
