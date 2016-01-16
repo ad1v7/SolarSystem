@@ -22,7 +22,7 @@ public class Particle3D  {
      *
      */
 
-    /** Default constructor. Constructs a new uninitialised Particle3D. 
+    /** Default constructor. Constructs a new Particle3D. 
      */   
     public Particle3D() {
         this.setMass(0.0);
@@ -154,10 +154,48 @@ public class Particle3D  {
      *
      * @param p1 first particle
      * @param p2 second particle
-     * @return Vector3D representing separation between p1 and p2
+     * @return Vector3D representing separation from p1 to p2
      */
     public static Vector3D pSep(Particle3D p1, Particle3D p2) {
-	return Vector3D.vecSub(p1.getPosition(),p2.getPosition());
+	return Vector3D.vecSub(p2.getPosition(),p1.getPosition());
+    }
+
+    /** Unit vector between two Particle3D
+     *
+     * @param p1 first particle
+     * @param p2 second particle
+     * @return unit Vector3D pointing from p1 to p2
+     */
+    public static Vector3D unitVec(Particle3D p1, Particle3D p2) {
+	return pSep(p1,p2).scalDiv(pSep(p1,p2).mag());
+    }
+
+
+    /** Magnitude of force between two Particle3D
+     *
+     * @param p1 first particle
+     * @param p2 second particle
+     * @return a double that is a magnitude of force between two particles
+     */
+    public static double magForce(Particle3D p1, Particle3D p2) {
+	return p1.getMass() * p2.getMass() / pSep(p1,p2).magSq();
+    }
+
+    /** The kinetic energy of a Particle3D,
+     * calculated as 1/2*m*v^2.
+     *
+     * @param p a Particle3D
+     * @return a double that is the kinetic energy.
+     */
+
+    /** Force Vector3D between two Particle3D
+     *
+     * @param p1 first particle
+     * @param p2 second particle
+     * @return a Vector3D representing force on p1 due to p2
+     */
+    public static Vector3D vecForce(Particle3D p1, Particle3D p2) {
+	return unitVec(p1,p2).scalMul(magForce(p1,p2));
     }
 
     /** The kinetic energy of a Particle3D,
