@@ -6,7 +6,7 @@ import java.io.*;
  *
  * @author M. Kirsz
  * @author R. Pruciak
- * @version "11/2015"
+ * @version "01/2016"
  *
  */
 public class Particle3D  {
