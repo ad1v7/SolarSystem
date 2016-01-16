@@ -181,13 +181,6 @@ public class Particle3D  {
 	return p1.getMass() * p2.getMass() / pSep(p1,p2).magSq();
     }
 
-    /** The kinetic energy of a Particle3D,
-     * calculated as 1/2*m*v^2.
-     *
-     * @param p a Particle3D
-     * @return a double that is the kinetic energy.
-     */
-
     /** Force Vector3D between two Particle3D
      *
      * @param p1 first particle
@@ -197,6 +190,13 @@ public class Particle3D  {
     public static Vector3D vecForce(Particle3D p1, Particle3D p2) {
 	return unitVec(p1,p2).scalMul(magForce(p1,p2));
     }
+
+    /** The kinetic energy of a Particle3D,
+     * calculated as 1/2*m*v^2.
+     *
+     * @param p a Particle3D
+     * @return a double that is the kinetic energy.
+     */
 
     /** The kinetic energy of a Particle3D,
      * calculated as 1/2*m*v^2.
