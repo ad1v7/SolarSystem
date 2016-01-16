@@ -223,7 +223,7 @@ public class Particle3D  {
      * @return potential energy of p1 and p2
      */
     public static double potEnergy(Particle3D p1, Particle3D p2) {
-	return -p1.getMass()*p2.getMass()/pSep(p1,p2).magSq();  }
+	return -p1.getMass()*p2.getMass()/pSep(p1,p2).mag();  }
 
     /** Total energy of two Particle3D
      * as a sum of kinetic and potential energies
