@@ -41,7 +41,7 @@ public class Particle2DVerlet {
 	 * Start of the Verlet algorithm
 	 */
 
-
+	output.printf("%s %f\n", Particle3D.unitVec(Central,Orbital), Particle3D.magForce(Central,Orbital));
 	// Prints the intial position to file
 	//		output.printf("%s %s\n", Orbital.getPosition().getX(), Orbital.getPosition().getY());
 
