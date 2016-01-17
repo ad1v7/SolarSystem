@@ -5,7 +5,7 @@
  *
  * @author M. Kirsz
  * @author R. Pruciak
- * @author "11/2015"
+ * @author "12/2015"
  *
  */
 
