@@ -1,7 +1,7 @@
 /**
  * Computer Modelling, Exercise 3.
  *
- * Run with arguments: output input number_of_steps timestep
+ * Run with ARGUMENTS: output input number_of_steps timestep
  *
  * @author M. Kirsz
  * @author R. Pruciak
