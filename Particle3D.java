@@ -34,6 +34,7 @@ public class Particle3D  {
     /** Explicit constructor. Constructs a new Particle3D with
      * explicitly given position, velocity, and mass.
      *
+     * @param l a String that represents particle label.
      * @param m a double that defines the mass.
      * @param p a Vector3D that defines the position.
      * @param v a Vector3D that defines the velocity.
@@ -138,7 +139,7 @@ public class Particle3D  {
     }
     
     /** Time integration support: evolve the position
-     * according to dx = v * dt + 0.5 * a * dt**2.
+     * according to dx = v * dt + 0.5 * a * dt^2.
      *
      * @param dt a double that is the timestep.
      * @param force a Vector3D that is the current force.
