@@ -1,11 +1,11 @@
 /**
  * Computer Modelling, Exercise 3.
  *
- * Run with arguments: output input number_of_steps timestep
+ * Run with ARGUMENTS: output input number_of_steps timestep
  *
  * @author M. Kirsz
  * @author R. Pruciak
- * @author "11/2015"
+ * @author "01/2016"
  *
  */
 
@@ -41,7 +41,10 @@ public class Particle2DVerlet {
 	 * Start of the Verlet algorithm
 	 */
 
-
+	output.printf("%s %f\n", Particle3D.unitVec(Central,Orbital), Particle3D.magForce(Central,Orbital));
+	output.printf("%s %f\n", Particle3D.vecForce(Central,Orbital), Particle3D.vecForce(Central,Orbital).mag());
+	output.printf("%s %f\n", Particle3D.pSep(Central,Orbital), Particle3D.pSep(Central,Orbital).mag());
+	output.printf("%s %f\n", Particle3D.potEnergy(Central,Orbital), Particle3D.pSep(Central,Orbital).mag());
 	// Prints the intial position to file
 	//		output.printf("%s %s\n", Orbital.getPosition().getX(), Orbital.getPosition().getY());
 
@@ -51,6 +54,9 @@ public class Particle2DVerlet {
 	// Initial force vector
 	double magForce = -Orbital.getMass()*Central.getMass() / Particle3D.pSep(Orbital, Central).magSq();
 	Vector3D force = new Vector3D(Particle3D.pSep(Orbital, Central).scalMul(magForce));
+
+	// // // // print total energy, k. energy, p. energy, force (vec + mag) on F_12 and F_21
+	// change mass to >1
 
 	/*
 	 * Loop over timesteps

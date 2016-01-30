@@ -4,7 +4,7 @@
  *
  * @author M. Kirsz
  * @author R. Pruciak
- * @version "11/2015"
+ * @version "01/2016"
  *
  */
 
