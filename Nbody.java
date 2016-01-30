@@ -22,10 +22,10 @@ public class Nbody {
 	// NEED TO GENERALIZE: INPUT PARAM FROM A FILE
 
 	// Number of timesteps
-	//	int numstep = Integer.parseInt(argv[2]);
+	double numstep = 10;
 
 	// Size of timestep
-	//	double dt = Double.parseDouble(argv[3]);
+	double dt = 0.01;
 
 	// Initial time
 	double t = 0.0;
@@ -81,12 +81,7 @@ public class Nbody {
 	 * Start of the Verlet algorithm
 	 */
 	/*
-	output.printf("%s %f\n", Particle3D.unitVec(Central,Orbital), Particle3D.magForce(Central,Orbital));
-	output.printf("%s %f\n", Particle3D.vecForce(Central,Orbital), Particle3D.vecForce(Central,Orbital).mag());
-	output.printf("%s %f\n", Particle3D.pSep(Central,Orbital), Particle3D.pSep(Central,Orbital).mag());
-	output.printf("%s %f\n", Particle3D.potEnergy(Central,Orbital), Particle3D.pSep(Central,Orbital).mag());
 
-	*/
 	// Prints the intial position to file
 	//		output.printf("%s %s\n", Orbital.getPosition().getX(), Orbital.getPosition().getY());
 
@@ -94,23 +89,24 @@ public class Nbody {
 	// output.printf("%10.5f %10.10f\n", t, Particle3D.totEnergy(Orbital, Central));
 
 	// Initial force vector
-	/*
-	double magForce = -Orbital.getMass()*Central.getMass() / Particle3D.pSep(Orbital, Central).magSq();
-	Vector3D force = new Vector3D(Particle3D.pSep(Orbital, Central).scalMul(magForce));
+	// Already calculated (see up)
 
-	// // // // print total energy, k. energy, p. energy, force (vec + mag) on F_12 and F_21
-	// change mass to >1
-	*/
 	/*
 	 * Loop over timesteps
 	 */
 
-	/*
+
 	for (int i=0;i<numstep;i++) {
 
 	    // Update the position using current velocity
-	    Orbital.leapPosition(dt,force);
 
+	    for (int j=0; j < nPar; j++) {
+
+	    allPar[j].leapPosition(dt,parForce[j][0]);
+
+	    }
+
+	    /*
 	    // Force after time leap
 	    double magForce_new = -Orbital.getMass()*Central.getMass() / Particle3D.pSep(Orbital, Central).magSq();
 	    Vector3D force_new = new Vector3D(Particle3D.pSep(Orbital, Central).scalMul(magForce_new));
@@ -130,8 +126,13 @@ public class Nbody {
 
 	    // Prints current time and total energy to file
 	    // output.printf("%10.5f %10.10f\n", t, Particle3D.totEnergy(Orbital, Central));
+	    */
 	}
-*/
+
+	for (int i=0; i<nPar; i++) {
+	    output.printf(" %s %s \n", allPar[i], parForce[i][0]);
+	}
+	    
 	// Close the output file
 	output.close();
     }

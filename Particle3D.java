@@ -149,6 +149,8 @@ public class Particle3D  {
 	position = Vector3D.vecAdd(position,velocity.scalMul(dt));
 	position = Vector3D.vecAdd(position,force.scalMul(0.5/mass*dt*dt));
     } 
+
+ 
     
     /*
      * Static Methods
