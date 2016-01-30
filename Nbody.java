@@ -33,14 +33,14 @@ public class Nbody {
 	// Opens the output file
 	String outFile = argv[0];
         PrintWriter output = new PrintWriter(new FileWriter(outFile));
-  PrintWriter output2 = new PrintWriter(new FileWriter("central"));
-
+	PrintWriter output2 = new PrintWriter(new FileWriter("central"));
+	
 	// count number of particles in an input file and store it in nPar
 	BufferedReader reader = new BufferedReader(new FileReader(argv[1]));
 	int nPar = 0;
 	while (reader.readLine() != null) nPar++;
 	reader.close();
-
+	
 	// Attach a scanner to the input file
 	BufferedReader inputFile = new BufferedReader(new FileReader(argv[1]));
 	Scanner scan = new Scanner(inputFile);
@@ -102,11 +102,11 @@ output.printf("%s %s\n", allPar[1].getPosition().getX(), allPar[1].getPosition()
 
 	    // Update the position using current velocity
 
-	    //	    for (int j=0; j < nPar; j++) {
+	    for (int j=0; j < nPar; j++) {
 
-	    allPar[1].leapPosition(dt,parForce[1][0]);
+	    allPar[j].leapPosition(dt,parForce[j][0]);
 
-	    //	    }
+	    }
 	    
 	    // Force after time leap
 	for (int k=0; k < nPar; k++) {
@@ -120,11 +120,11 @@ output.printf("%s %s\n", allPar[1].getPosition().getX(), allPar[1].getPosition()
 	   
 	    // Update the velocity ready for the next position update
 	 
-	//	    for (int j=0; j < nPar; j++) {
+	for (int j=0; j < nPar; j++) {
 
-		allPar[1].leapVelocity(dt,Vector3D.vecAdd(parForce[1][0],parForce[1][1]).scalDiv(2));
+		allPar[j].leapVelocity(dt,Vector3D.vecAdd(parForce[j][0],parForce[j][1]).scalDiv(2));
 
-		//  } 
+	} 
 
 	    //	Orbital.leapVelocity(dt, Vector3D.vecAdd(force, force_new).scalDiv(2));
 
