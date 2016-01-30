@@ -22,7 +22,7 @@ public class Nbody {
 	// NEED TO GENERALIZE: INPUT PARAM FROM A FILE
 
 	// Number of timesteps
-	double numstep = 1000;
+	double numstep = 10000;
 
 	// Size of timestep
 	double dt = 0.01;
@@ -31,18 +31,18 @@ public class Nbody {
 	double t = 0.0;
 
 	// Opens the output file
-	String outFile = argv[0];
+	String outFile = "output.dat";
         PrintWriter output = new PrintWriter(new FileWriter(outFile));
 	PrintWriter output2 = new PrintWriter(new FileWriter("central"));
 	
 	// count number of particles in an input file and store it in nPar
-	BufferedReader reader = new BufferedReader(new FileReader(argv[1]));
+	BufferedReader reader = new BufferedReader(new FileReader("input.dat"));
 	int nPar = 0;
 	while (reader.readLine() != null) nPar++;
 	reader.close();
 	
 	// Attach a scanner to the input file
-	BufferedReader inputFile = new BufferedReader(new FileReader(argv[1]));
+						   BufferedReader inputFile = new BufferedReader(new FileReader("input.dat"));
 	Scanner scan = new Scanner(inputFile);
 
 	// Create new array of Particles3D and copy particles from an input file
@@ -85,7 +85,13 @@ public class Nbody {
 
 	//Prints the intial position to file
 	
-output.printf("%s %s\n", allPar[1].getPosition().getX(), allPar[1].getPosition().getY());
+	    output.printf("%d\n", nPar);
+	    output.printf("Point = %d\n", 1);
+	    for (int j=0; j < nPar; j++) {
+	    output.printf("%s\n", allPar[j]);
+	    }
+
+	//output.printf("%s %s\n", allPar[1].getPosition().getX(), allPar[1].getPosition().getY());
 
 	// Prints initial time and total energy to file
 	// output.printf("%10.5f %10.10f\n", t, Particle3D.totEnergy(Orbital, Central));
@@ -143,10 +149,12 @@ output.printf("%s %s\n", allPar[1].getPosition().getX(), allPar[1].getPosition()
 	    // Increase the time
 	    t = t + dt;
 
-	    //Prints the current position to file
-	    output.printf("%s %s\n", allPar[1].getPosition().getX(), allPar[1].getPosition().getY() );
-
-	    output2.printf("%s %s\n", allPar[0].getPosition().getX(), allPar[0].getPosition().getY() );
+	    //Prints the current position to VMD file (need method)
+	    output.printf("%d\n", nPar);
+	    output.printf("Point = %d\n", i+2);
+	    for (int j=0; j < nPar; j++) {
+	    output.printf("%s\n", allPar[j]);
+	    }
 
 	    // Prints current time and total energy to file
 	    // output.printf("%10.5f %10.10f\n", t, Particle3D.totEnergy(Orbital, Central));
