@@ -55,6 +55,9 @@ public class Particle2DVerlet {
 	double magForce = -Orbital.getMass()*Central.getMass() / Particle3D.pSep(Orbital, Central).magSq();
 	Vector3D force = new Vector3D(Particle3D.pSep(Orbital, Central).scalMul(magForce));
 
+	// // // // print total energy, k. energy, p. energy, force (vec + mag) on F_12 and F_21
+	// change mass to >1
+
 	/*
 	 * Loop over timesteps
 	 */
