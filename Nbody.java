@@ -2,7 +2,7 @@
  * Computer Modelling, Project
  * Simulation of the Solar System
  *
- * Run with ARGUMENTS:
+ * Run with ARGUMENTS: output input
  *
  * @author M. Kirsz
  * @author R. Pruciak
@@ -22,7 +22,7 @@ public class Nbody {
 	// NEED TO GENERALIZE: INPUT PARAM FROM A FILE
 
 	// Number of timesteps
-	double numstep = 10;
+	double numstep = 1000;
 
 	// Size of timestep
 	double dt = 0.01;
@@ -33,6 +33,7 @@ public class Nbody {
 	// Opens the output file
 	String outFile = argv[0];
         PrintWriter output = new PrintWriter(new FileWriter(outFile));
+  PrintWriter output2 = new PrintWriter(new FileWriter("central"));
 
 	// count number of particles in an input file and store it in nPar
 	BufferedReader reader = new BufferedReader(new FileReader(argv[1]));
@@ -64,26 +65,27 @@ public class Nbody {
 
 	for (int i=0; i < nPar; i++) {
 	    for (int j=0; j < nPar; j++) {
-		if (i != j) {
+		//	if (i != j) {
 		  
 		    parForce[i][0] = Vector3D.vecAdd(parForce[i][0], Particle3D.vecForce(allPar[i], allPar[j]));
-		}
+		    //		}
 	    }
-
 	}
 
+	/*
 	for (int i=0; i<nPar; i++) {
 	    output.printf(" %s %s \n", allPar[i], parForce[i][0]);
 	}
 	
-
+	*/
 	/*
 	 * Start of the Verlet algorithm
 	 */
-	/*
+	
 
-	// Prints the intial position to file
-	//		output.printf("%s %s\n", Orbital.getPosition().getX(), Orbital.getPosition().getY());
+	//Prints the intial position to file
+	
+output.printf("%s %s\n", allPar[1].getPosition().getX(), allPar[1].getPosition().getY());
 
 	// Prints initial time and total energy to file
 	// output.printf("%10.5f %10.10f\n", t, Particle3D.totEnergy(Orbital, Central));
@@ -100,40 +102,65 @@ public class Nbody {
 
 	    // Update the position using current velocity
 
-	    for (int j=0; j < nPar; j++) {
+	    //	    for (int j=0; j < nPar; j++) {
 
-	    allPar[j].leapPosition(dt,parForce[j][0]);
+	    allPar[1].leapPosition(dt,parForce[1][0]);
 
-	    }
-
-	    /*
+	    //	    }
+	    
 	    // Force after time leap
-	    double magForce_new = -Orbital.getMass()*Central.getMass() / Particle3D.pSep(Orbital, Central).magSq();
-	    Vector3D force_new = new Vector3D(Particle3D.pSep(Orbital, Central).scalMul(magForce_new));
+	for (int k=0; k < nPar; k++) {
+	    for (int j=0; j < nPar; j++) {
+		//	if (k != j) {
+		  
+		    parForce[k][1] = Vector3D.vecAdd(parForce[k][1], Particle3D.vecForce(allPar[k], allPar[j]));
+		    //	}
+	    }
+	}
 	   
 	    // Update the velocity ready for the next position update
-	    Orbital.leapVelocity(dt, Vector3D.vecAdd(force, force_new).scalDiv(2));
+	 
+	//	    for (int j=0; j < nPar; j++) {
+
+		allPar[1].leapVelocity(dt,Vector3D.vecAdd(parForce[1][0],parForce[1][1]).scalDiv(2));
+
+		//  } 
+
+	    //	Orbital.leapVelocity(dt, Vector3D.vecAdd(force, force_new).scalDiv(2));
 
 	    // Update force
-	    magForce = magForce_new;
-	    force = force_new;
+
+
+	    for (int j=0; j < nPar; j++) {
+		parForce[j][0] = new Vector3D(parForce[j][1]);
+		parForce[j][1] = new Vector3D();
+	    }
+
+
+	    //	    magForce = magForce_new;
+	    //	    force = force_new;
 
 	    // Increase the time
 	    t = t + dt;
 
-	    // Prints the current position to file
-	    output.printf("%s %s\n", Orbital.getPosition().getX(), Orbital.getPosition().getY() );
+	    //Prints the current position to file
+	    output.printf("%s %s\n", allPar[1].getPosition().getX(), allPar[1].getPosition().getY() );
+
+	    output2.printf("%s %s\n", allPar[0].getPosition().getX(), allPar[0].getPosition().getY() );
 
 	    // Prints current time and total energy to file
 	    // output.printf("%10.5f %10.10f\n", t, Particle3D.totEnergy(Orbital, Central));
-	    */
+	    
 	}
 
+	/*
 	for (int i=0; i<nPar; i++) {
 	    output.printf(" %s %s \n", allPar[i], parForce[i][0]);
 	}
-	    
+	*/
+  
 	// Close the output file
 	output.close();
+	output2.close();
     }
 }

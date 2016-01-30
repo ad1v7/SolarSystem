@@ -174,7 +174,12 @@ public class Particle3D  {
      * @return unit Vector3D pointing from p1 to p2
      */
     public static Vector3D unitVec(Particle3D p1, Particle3D p2) {
-	return pSep(p1,p2).scalDiv(pSep(p1,p2).mag());
+
+	double r = pSep(p1,p2).mag();
+	if (r==0) { return new Vector3D(); }
+	else {
+	return pSep(p1,p2).scalDiv(r);
+	}
     }
 
     /** Magnitude of force between two Particle3D
@@ -184,7 +189,14 @@ public class Particle3D  {
      * @return a double that is a magnitude of force between two particles
      */
     public static double magForce(Particle3D p1, Particle3D p2) {
-	return p1.getMass() * p2.getMass() / pSep(p1,p2).magSq();
+
+	double r = pSep(p1,p2).magSq();
+
+	if  (r == 0) { return 0.0; }
+
+	else {
+	    return p1.getMass() * p2.getMass() / r;
+	}
     }
 
     /** Force Vector3D between two Particle3D
