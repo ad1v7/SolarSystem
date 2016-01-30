@@ -112,7 +112,7 @@ public class Particle3D  {
      * @return the string representation of a Particle3D
      */
     public String toString() {
-        return this.getLabel() + this.getPosition();
+        return this.getLabel() + " " + this.getPosition();
     } 
 
     /*
