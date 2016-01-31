@@ -256,4 +256,40 @@ public class Particle3D  {
 	return p;
     }
 
+    //// below need testing + desciption
+
+    public static void leapPosition(double dt, Particle3D[] p, Vector3D[][] v) {
+	 
+	for (int i=0; i < p.length; i++) {	    
+	    p[i].leapPosition(dt,v[i][0]);
+	}
+    }
+
+    public static void leapVelocity(double dt, Particle3D[] p, Vector3D[][] v) {
+
+	for (int i=0; i < p.length; i++) {
+	    p[i].leapVelocity(dt,Vector3D.vecAdd(v[i][0],v[i][1]).scalDiv(2));
+	} 
+    }
+
+    public static void upForce(Particle3D[] p, Vector3D[][] v, int k) {
+	for (int i=0; i < p.length; i++) {
+	    for (int j=0; j < p.length; j++) {		  
+		    v[i][k] = Vector3D.vecAdd(v[i][k], Particle3D.vecForce(p[i], p[j]));
+	    }
+	}  
+    }
+   
+    public static String vmd(Particle3D[] p, int i) {
+
+	String s1;
+	String s2 = ""; // so compiler doesn't complain
+
+	s1 =	String.format("%d\nPoint = %d\n", p.length, i);
+	for (int j=0; j < p.length; j++) {
+	    s2 = s2 + String.format("%s\n", p[j]);
+	}   
+	return s1+s2;
+    }
+
 }
