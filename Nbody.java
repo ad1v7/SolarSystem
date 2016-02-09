@@ -22,16 +22,16 @@ public class Nbody {
 	// NEED TO GENERALIZE: INPUT PARAM FROM A FILE
 
 	// Number of timesteps
-	double numstep = 10000;
+	double numstep = 10000000;
 
 	// Size of timestep
-	double dt = 0.01;
+	double dt = 10;
 
 	// Initial time
 	double t = 0.0;
 
 	// Opens the output file
-	String outFile = "output2.dat";
+	String outFile = "output.xyz";
         PrintWriter output = new PrintWriter(new FileWriter(outFile));
 	
 	// count number of particles in an input file and store it in nPar
@@ -97,10 +97,10 @@ public class Nbody {
 
 	    // Increase the time
 	    t = t + dt;
-
+	    if (i % 10000 == 0) {
 	    //Prints the current position to VMD file (need method)	   
 	    output.printf(Particle3D.vmd(allPar, i+2));
-
+	    }
 	    // Prints current time and total energy to file
 	    // output.printf("%10.5f %10.10f\n", t, Particle3D.totEnergy(Orbital, Central));
 	    

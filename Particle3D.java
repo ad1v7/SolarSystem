@@ -191,11 +191,11 @@ public class Particle3D  {
     public static double magForce(Particle3D p1, Particle3D p2) {
 
 	double r = pSep(p1,p2).magSq();
-
+	double G = 6.67408e-11;
 	if  (r == 0) { return 0.0; }
 
 	else {
-	    return p1.getMass() * p2.getMass() / r;
+	    return G * p1.getMass() * p2.getMass() / r;
 	}
     }
 
@@ -271,11 +271,13 @@ public class Particle3D  {
 	    p[i].leapVelocity(dt,Vector3D.vecAdd(v[i][0],v[i][1]).scalDiv(2));
 	} 
     }
-
+    // do we need else statement?
     public static void upForce(Particle3D[] p, Vector3D[][] v, int k) {
 	for (int i=0; i < p.length; i++) {
 	    for (int j=0; j < p.length; j++) {		  
+		if (i!=j) {
 		    v[i][k] = Vector3D.vecAdd(v[i][k], Particle3D.vecForce(p[i], p[j]));
+		}
 	    }
 	}  
     }
