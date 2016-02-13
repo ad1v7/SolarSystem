@@ -2,15 +2,14 @@
  * Computer Modelling, Project
  * Simulation of the Solar System
  *
- * Run with ARGUMENTS: output input
+ * Run with ARGUMENTS: ????output input????
  *
  * @author M. Kirsz
  * @author R. Pruciak
- * @author "01/2016"
+ * @data "02/2016"
  *
  */
 
-// IO package for file writing
 import java.io.*;
 import java.util.Scanner;
 import java.lang.*;
@@ -22,22 +21,27 @@ public class Nbody {
 	// NEED TO GENERALIZE: INPUT PARAM FROM A FILE
 
 	// Number of timesteps
-	double numstep = 10000000;
+	double numberOfSteps = 10000000;
 
 	// Size of timestep
-	double dt = 10;
+	double stepSize = 10;
 
 	// Initial time
-	double t = 0.0;
+	double time = 0.0;
+
+	// print every k-th step
+	int printFrequency = 10000;
 
 	// Opens the output file
 	String outFile = "output.xyz";
         PrintWriter output = new PrintWriter(new FileWriter(outFile));
 	
-	// count number of particles in an input file and store it in nPar
+	// count number of particles in an input file
 	BufferedReader reader = new BufferedReader(new FileReader("input.dat"));
-	int nPar = 0;
-	while (reader.readLine() != null) nPar++;
+	int numberOfParticles = 0;
+	while (reader.readLine() != null) {
+	    numberOfParticles++;
+	}
 	reader.close();
 	
 	// Attach a scanner to the input file
@@ -45,62 +49,64 @@ public class Nbody {
 	Scanner scan = new Scanner(inputFile);
 
 	// Create new array of Particles3D and copy particles from an input file
-	Particle3D allPar[] = new Particle3D[nPar];
+	Particle3D particleArray[] = new Particle3D[numberOfParticles];
 	for (int i=0; scan.hasNext(); i++) {
-	    allPar[i] = Particle3D.pScanner(scan);
+	    particleArray[i] = Particle3D.pScanner(scan);
 	}
 	
+	// Set up an array which stores forces
+	// i-th- currentforce: [i][0]
+	// i-th newforce: [i][1] 
+	int currentForce = 0;
+	int newForce = 1;
+	Vector3D forceArray[][] = new Vector3D[numberOfParticles][2];
 
-	// Set up array which stores i-th Particle
-	// ith-force: [i][0] and force_new: [i][1] 
-	// [row][col] <<-- delete that ;)
-	Vector3D parForce[][] = new Vector3D[nPar][2];
-
-	for (int i = 0; i < nPar; i++ ) {
-	    parForce[i][0] = new Vector3D();
-	    parForce[i][1] = new Vector3D();
+	for (int i = 0; i < numberOfParticles; i++ ) {
+	    forceArray[i][currentForce] = new Vector3D();
+	    forceArray[i][newForce] = new Vector3D();
 	}
 
 	// calculate initial forces
-	Particle3D.upForce(allPar, parForce, 0);
+	Particle3D.updateForce(particleArray, forceArray, currentForce);
 	
 	/*
 	 * Start of the Verlet algorithm
 	 */
 	
-
-	//Prints the intial position to file
-	output.printf(Particle3D.vmd(allPar, 1));
-
+	//Prints the initial position to file
+	int stepNumber = 1;
+	output.printf(Particle3D.vmd(particleArray, stepNumber));
+	stepNumber++;
 
 	/*
 	 * Loop over timesteps
 	 */
 
-
-	for (int i=0;i<numstep;i++) {
+	for (int i=0; i<numberOfSteps; i++) {
 
 	    // Update the position using current velocity
-	    Particle3D.leapPosition(dt, allPar, parForce);
+	    Particle3D.leapPosition(stepSize, particleArray, forceArray);
 
 	    // Force after time leap
-	    Particle3D.upForce(allPar, parForce, 1);
+	    Particle3D.updateForce(particleArray, forceArray, newForce);
   
 	    // Update the velocity ready for the next position update
-	    Particle3D.leapVelocity(dt, allPar, parForce);
+	    Particle3D.leapVelocity(stepSize, particleArray, forceArray);
 
 	    // Update force
-	    for (int j=0; j < nPar; j++) {
-		parForce[j][0] = new Vector3D(parForce[j][1]);
-		parForce[j][1] = new Vector3D();
+	    for (int j=0; j < numberOfParticles; j++) {
+		forceArray[j][currentForce] = new Vector3D(forceArray[j][newForce]);
+		forceArray[j][newForce] = new Vector3D();
 	    }
 
 	    // Increase the time
-	    t = t + dt;
-	    if (i % 10000 == 0) {
-	    //Prints the current position to VMD file (need method)	   
-	    output.printf(Particle3D.vmd(allPar, i+2));
+	    time = time + stepSize;
+
+	    // Prints every k-th position to VMD file
+	    if (i % printFrequency == 0) {	   
+	    output.printf(Particle3D.vmd(particleArray, stepNumber));
 	    }
+	    stepNumber++;
 	    // Prints current time and total energy to file
 	    // output.printf("%10.5f %10.10f\n", t, Particle3D.totEnergy(Orbital, Central));
 	    

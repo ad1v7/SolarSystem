@@ -272,22 +272,22 @@ public class Particle3D  {
 	} 
     }
     // do we need else statement?
-    public static void upForce(Particle3D[] p, Vector3D[][] v, int k) {
+    public static void updateForce(Particle3D[] p, Vector3D[][] force, int k) {
 	for (int i=0; i < p.length; i++) {
 	    for (int j=0; j < p.length; j++) {		  
 		if (i!=j) {
-		    v[i][k] = Vector3D.vecAdd(v[i][k], Particle3D.vecForce(p[i], p[j]));
+		    force[i][k] = Vector3D.vecAdd(force[i][k], Particle3D.vecForce(p[i], p[j]));
 		}
 	    }
 	}  
     }
-   
-    public static String vmd(Particle3D[] p, int i) {
+
+    public static String vmd(Particle3D[] p, int stepNumber) {
 
 	String s1;
-	String s2 = ""; // so compiler doesn't complain
+      	String s2 = ""; // so compiler doesn't complain
 
-	s1 =	String.format("%d\nPoint = %d\n", p.length, i);
+	s1 =	String.format("%d\nPoint = %d\n", p.length, stepNumber);
 	for (int j=0; j < p.length; j++) {
 	    s2 = s2 + String.format("%s\n", p[j]);
 	}   
