@@ -6,7 +6,7 @@ import java.io.*;
  *
  * @author M. Kirsz
  * @author R. Pruciak
- * @version "01/2016"
+ * @version "02/2016"
  *
  */
 public class Particle3D  {
@@ -16,6 +16,8 @@ public class Particle3D  {
     private double mass;
     private Vector3D position;
     private Vector3D velocity;
+
+    static double G = 6.67408e-11;
 
     /* 
      * Constructors
@@ -128,7 +130,7 @@ public class Particle3D  {
     public void leapVelocity(double dt, Vector3D force) {
 	velocity = Vector3D.vecAdd(velocity,force.scalMul(dt/mass));
     }
-       
+
     /** Time integration support: evolve the position
      * according to dx = v * dt.
      *
@@ -149,8 +151,6 @@ public class Particle3D  {
 	position = Vector3D.vecAdd(position,velocity.scalMul(dt));
 	position = Vector3D.vecAdd(position,force.scalMul(0.5/mass*dt*dt));
     } 
-
- 
     
     /*
      * Static Methods
@@ -174,11 +174,10 @@ public class Particle3D  {
      * @return unit Vector3D pointing from p1 to p2
      */
     public static Vector3D unitVec(Particle3D p1, Particle3D p2) {
-
 	double r = pSep(p1,p2).mag();
 	if (r==0) { return new Vector3D(); }
 	else {
-	return pSep(p1,p2).scalDiv(r);
+	    return pSep(p1,p2).scalDiv(r);
 	}
     }
 
@@ -189,11 +188,8 @@ public class Particle3D  {
      * @return a double that is a magnitude of force between two particles
      */
     public static double magForce(Particle3D p1, Particle3D p2) {
-
 	double r = pSep(p1,p2).magSq();
-	double G = 6.67408e-11;
 	if  (r == 0) { return 0.0; }
-
 	else {
 	    return G * p1.getMass() * p2.getMass() / r;
 	}
@@ -256,42 +252,38 @@ public class Particle3D  {
 	return p;
     }
 
-    //// below need testing + desciption
+    //// below need testing + description
 
-    public static void leapPosition(double dt, Particle3D[] p, Vector3D[][] v) {
-	 
+    public static void leapPosition(double dt, Particle3D[] p, Vector3D[] f) {	 
 	for (int i=0; i < p.length; i++) {	    
-	    p[i].leapPosition(dt,v[i][0]);
+	    p[i].leapPosition(dt,f[i]);
 	}
     }
 
-    public static void leapVelocity(double dt, Particle3D[] p, Vector3D[][] v) {
-
+    public static void leapVelocity(double dt, Particle3D[] p, Vector3D[] currentForce, Vector3D[] newForce) {
 	for (int i=0; i < p.length; i++) {
-	    p[i].leapVelocity(dt,Vector3D.vecAdd(v[i][0],v[i][1]).scalDiv(2));
-	} 
+	    p[i].leapVelocity(dt,Vector3D.vecAdd(currentForce[i],newForce[i]).scalDiv(2));
+	}
     }
+
     // do we need else statement?
-    public static void updateForce(Particle3D[] p, Vector3D[][] force, int k) {
+    public static void updateForce(Particle3D[] p, Vector3D[] f) {
 	for (int i=0; i < p.length; i++) {
 	    for (int j=0; j < p.length; j++) {		  
-		if (i!=j) {
-		    force[i][k] = Vector3D.vecAdd(force[i][k], Particle3D.vecForce(p[i], p[j]));
+		if (i != j) {
+		    f[i] = Vector3D.vecAdd(f[i], vecForce(p[i], p[j]));
 		}
 	    }
 	}  
     }
 
     public static String vmd(Particle3D[] p, int stepNumber) {
-
 	String s1;
       	String s2 = ""; // so compiler doesn't complain
-
 	s1 =	String.format("%d\nPoint = %d\n", p.length, stepNumber);
 	for (int j=0; j < p.length; j++) {
 	    s2 = s2 + String.format("%s\n", p[j]);
 	}   
 	return s1+s2;
     }
-
 }

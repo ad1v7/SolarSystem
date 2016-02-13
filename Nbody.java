@@ -6,7 +6,7 @@
  *
  * @author M. Kirsz
  * @author R. Pruciak
- * @data "02/2016"
+ * @version "02/2016"
  *
  */
 
@@ -54,20 +54,18 @@ public class Nbody {
 	    particleArray[i] = Particle3D.pScanner(scan);
 	}
 	
-	// Set up an array which stores forces
-	// i-th- currentforce: [i][0]
-	// i-th newforce: [i][1] 
-	int currentForce = 0;
-	int newForce = 1;
-	Vector3D forceArray[][] = new Vector3D[numberOfParticles][2];
-
+	// Set up arrays which store forces
+	Vector3D currentForceArray[] = new Vector3D[numberOfParticles];
+	Vector3D newForceArray[] = new Vector3D[numberOfParticles];
+	
+	// set all forces to 0 to avoid later problems
 	for (int i = 0; i < numberOfParticles; i++ ) {
-	    forceArray[i][currentForce] = new Vector3D();
-	    forceArray[i][newForce] = new Vector3D();
+	    currentForceArray[i] = new Vector3D();
+	    newForceArray[i] = new Vector3D();
 	}
-
+	
 	// calculate initial forces
-	Particle3D.updateForce(particleArray, forceArray, currentForce);
+	Particle3D.updateForce(particleArray, currentForceArray);
 	
 	/*
 	 * Start of the Verlet algorithm
@@ -85,18 +83,18 @@ public class Nbody {
 	for (int i=0; i<numberOfSteps; i++) {
 
 	    // Update the position using current velocity
-	    Particle3D.leapPosition(stepSize, particleArray, forceArray);
+	    Particle3D.leapPosition(stepSize, particleArray, currentForceArray);
 
-	    // Force after time leap
-	    Particle3D.updateForce(particleArray, forceArray, newForce);
+	    // Update force after time leap
+	    Particle3D.updateForce(particleArray, newForceArray);
   
 	    // Update the velocity ready for the next position update
-	    Particle3D.leapVelocity(stepSize, particleArray, forceArray);
+	    Particle3D.leapVelocity(stepSize, particleArray, currentForceArray, newForceArray);
 
 	    // Update force
 	    for (int j=0; j < numberOfParticles; j++) {
-		forceArray[j][currentForce] = new Vector3D(forceArray[j][newForce]);
-		forceArray[j][newForce] = new Vector3D();
+		currentForceArray[j] = new Vector3D(newForceArray[j]);
+		newForceArray[j] = new Vector3D();
 	    }
 
 	    // Increase the time
@@ -104,12 +102,9 @@ public class Nbody {
 
 	    // Prints every k-th position to VMD file
 	    if (i % printFrequency == 0) {	   
-	    output.printf(Particle3D.vmd(particleArray, stepNumber));
+		output.printf(Particle3D.vmd(particleArray, stepNumber));
 	    }
-	    stepNumber++;
-	    // Prints current time and total energy to file
-	    // output.printf("%10.5f %10.10f\n", t, Particle3D.totEnergy(Orbital, Central));
-	    
+	    stepNumber++;	    
 	}
   
 	// Close the output file
