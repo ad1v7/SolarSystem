@@ -216,14 +216,14 @@ public class Particle3D  {
     }
 
     /** The potential energy of two Particle3D
-     * calculated as -m_1*m*2/r
+     * calculated as -G*m1*m2/r
      *
      * @param p1 a Particle3D representing first particle
      * @param p2 a Particle3D representing second particle 
      * @return potential energy of p1 and p2
      */
     public static double potEnergy(Particle3D p1, Particle3D p2) {
-	return -p1.getMass()*p2.getMass()/pSep(p1,p2).mag();  }
+	return -G * p1.getMass() * p2.getMass() / pSep(p1,p2).mag();  }
 
     /** Total energy of two Particle3D
      * as a sum of kinetic and potential energies
@@ -286,4 +286,17 @@ public class Particle3D  {
 	}   
 	return s1+s2;
     }
+
+    // suppose to calculate total energy of the system
+    public static double sysEnergy(Particle3D[] p) {
+	double energy = 0;
+	for (int i=0; i<p.length; i++) {
+	    for (int j=i+1; j<p.length; j++) {
+		energy = energy + potEnergy(p[i],p[j]);
+	    }
+	    energy = energy + kEnergy(p[i]);
+	}
+	return energy;
+    }
+
 }

@@ -21,7 +21,7 @@ public class Nbody {
 	// NEED TO GENERALIZE: INPUT PARAM FROM A FILE
 
 	// Number of timesteps
-	double numberOfSteps = 10000000;
+	double numberOfSteps = 1000000;
 
 	// Size of timestep
 	double stepSize = 10;
@@ -103,6 +103,7 @@ public class Nbody {
 	    // Prints every k-th position to VMD file
 	    if (i % printFrequency == 0) {	   
 		output.printf(Particle3D.vmd(particleArray, stepNumber));
+		//	System.out.printf("%20.20e\n", Particle3D.sysEnergy(particleArray));
 	    }
 	    stepNumber++;	    
 	}
