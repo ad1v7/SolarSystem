@@ -18,41 +18,46 @@ public class Nbody {
 
     public static void main (String[] argv) throws IOException {
 
-	// NEED TO GENERALIZE: INPUT PARAM FROM A FILE
+	// Opens the input failing containing particles
+	String particle_file = argv[0];
 
-	// Number of timesteps
-	double numberOfSteps = 10000000;
-
-	// Size of timestep
-	double stepSize = 10;
-
-	// Initial time
-	double time = 0.0;
-
-	// print every k-th step
-	int printFrequency = 10000;
-
-	// Opens the output file
-	String outFile = "output.xyz";
-        PrintWriter output = new PrintWriter(new FileWriter(outFile));
-	
-	// count number of particles in an input file
-	BufferedReader reader = new BufferedReader(new FileReader("input.dat"));
+	// Count number of particles in an input file
+	BufferedReader reader = new BufferedReader(new FileReader(particle_file));
 	int numberOfParticles = 0;
 	while (reader.readLine() != null) {
 	    numberOfParticles++;
 	}
 	reader.close();
-	
+
 	// Attach a scanner to the input file
-	BufferedReader inputFile = new BufferedReader(new FileReader("input.dat"));
-	Scanner scan = new Scanner(inputFile);
+	BufferedReader p_file = new BufferedReader(new FileReader(particle_file));
+	Scanner scan = new Scanner(p_file);
 
 	// Create new array of Particles3D and copy particles from an input file
 	Particle3D particleArray[] = new Particle3D[numberOfParticles];
 	for (int i=0; scan.hasNext(); i++) {
 	    particleArray[i] = Particle3D.pScanner(scan);
 	}
+	
+
+	// Opens the second input file containing parameters: number of steps, size of timestep,
+	// initial time, print frequency
+	String param_file = argv[1];
+
+	// Attach a scanner to the second input file
+	BufferedReader par_file = new BufferedReader(new FileReader(param_file));
+	Scanner scan2 = new Scanner(par_file);
+
+	double numberOfSteps = scan2.nextDouble();
+	double stepSize = scan2.nextDouble();
+	double time = scan2.nextDouble();
+	int printFrequency = scan2.nextInt();
+
+
+	// Opens the output file
+	String outFile = argv[2];
+        PrintWriter output = new PrintWriter(new FileWriter(outFile));
+	
 	
 	// Set up arrays which store forces
 	Vector3D currentForceArray[] = new Vector3D[numberOfParticles];
@@ -127,9 +132,14 @@ public class Nbody {
 
 	  
 	    // Calculate aphelion and perihelion for each body in the simulation
-	    double separation = Particle3D.pSep(particleArray[0], particleArray[i]).mag();
-	    if (aphelionArray[i] < separation) {aphelionArray[i] = separation; }
-	    if (perihelionArray[i] > separation) {perihelionArray[i] = separation; }
+	    /*
+	     * Test for j=0
+	     */
+	    for (int j=1; j < numberOfParticles; j++) {
+		double separation = Particle3D.pSep(particleArray[0], particleArray[j]).mag();
+		if (aphelionArray[j] < separation) {aphelionArray[j] = separation; }
+		if (perihelionArray[j] > separation) {perihelionArray[j] = separation; }
+	    }
 
 	    // Increase the time
 	    time = time + stepSize;
