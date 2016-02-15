@@ -2,7 +2,7 @@
  * Computer Modelling, Project
  * Simulation of the Solar System
  *
- * Run with ARGUMENTS: ????output input????
+ * Run with ARGUMENTS: particle_file parameters output.xyz
  *
  * @author M. Kirsz
  * @author R. Pruciak
@@ -39,7 +39,6 @@ public class Nbody {
 	    particleArray[i] = Particle3D.pScanner(scan);
 	}
 	
-
 	// Opens the second input file containing parameters: number of steps, size of timestep,
 	// initial time, print frequency
 	String param_file = argv[1];
@@ -47,18 +46,15 @@ public class Nbody {
 	// Attach a scanner to the second input file
 	BufferedReader par_file = new BufferedReader(new FileReader(param_file));
 	Scanner scan2 = new Scanner(par_file);
-
 	double numberOfSteps = scan2.nextDouble();
 	double stepSize = scan2.nextDouble();
 	double time = scan2.nextDouble();
 	int printFrequency = scan2.nextInt();
 
-
 	// Opens the output file
 	String outFile = argv[2];
         PrintWriter output = new PrintWriter(new FileWriter(outFile));
-	
-	
+		
 	// Set up arrays which store forces
 	Vector3D currentForceArray[] = new Vector3D[numberOfParticles];
 	Vector3D newForceArray[] = new Vector3D[numberOfParticles];
@@ -77,20 +73,19 @@ public class Nbody {
 	output.printf(Particle3D.vmd(particleArray, stepNumber));
 	stepNumber++;
 
-
+	// arrays for orbit counter
 	double newAngle[] = new double[numberOfParticles];
 	double prevAngle[] = new double[numberOfParticles];
 	double angleDiff[] = new double[numberOfParticles]; 
 
+	// doubles for energy fluctuations calculations
 	double minEnergy = Particle3D.sysEnergy(particleArray);
 	double maxEnergy = Particle3D.sysEnergy(particleArray);
 	double energy;
 
-
 	// Arrays of doubles to store values of aphelions and periphelions for each body
 	double aphelionArray[] = new double[numberOfParticles];
 	double perihelionArray[] = new double[numberOfParticles];
-
 
 	// determine clockwise/anitclockwise orbits
 	boolean clockwise[] = new boolean[numberOfParticles];
@@ -102,7 +97,7 @@ public class Nbody {
 	}
 
 	/* 
-	 * Start of the Verlet Algorithm
+	 * Loop over times steps
 	 *
 	 */
 
@@ -114,6 +109,9 @@ public class Nbody {
 		prevAngle[j] = Math.atan2(particleArray[j].getPosition().getY(), particleArray[j].getPosition().getX());
 	    }
 
+	    /*
+	     * Start of the Verlet Algorithm
+	     */
 
 	    // Update the position using current velocity
 	    Particle3D.leapPosition(stepSize, particleArray, currentForceArray);
@@ -130,7 +128,14 @@ public class Nbody {
 		newForceArray[j] = new Vector3D();
 	    }
 
-	  
+	    // Increase the time and step number
+	    time = time + stepSize;
+	    stepNumber++;
+
+	    /*
+	     *  end of Verlet Algorithm
+	     */
+
 	    // Calculate aphelion and perihelion for each body in the simulation
 	    /*
 	     * Test for j=0
@@ -140,9 +145,6 @@ public class Nbody {
 		if (aphelionArray[j] < separation) {aphelionArray[j] = separation; }
 		if (perihelionArray[j] > separation) {perihelionArray[j] = separation; }
 	    }
-
-	    // Increase the time
-	    time = time + stepSize;
 
 	    // Prints every k-th position to VMD file
 	    // calc min and max energy every k-th step to save on calc
@@ -155,21 +157,20 @@ public class Nbody {
 	    }
 
 
+	    /*
+	     * Start of orbit counter
+	     */
 
-	    // count orbits
 	    for (int j=0; j<numberOfParticles; j++) {
 		newAngle[j] = Math.atan2(particleArray[j].getPosition().getY(), particleArray[j].getPosition().getX());
 
 		if (clockwise[j] == true) {
-
 		    if (Math.signum(prevAngle[j]) > Math.signum(newAngle[j])) {
 			angleDiff[j] += (Math.abs(newAngle[j]) + prevAngle[j]);
 		    }
-
 		    else if (Math.signum(prevAngle[j]) < Math.signum(newAngle[j])) {
 			angleDiff[j] += (2*Math.PI -(newAngle[j] - prevAngle[j]));
 		    }
-
 		    else {
 			angleDiff[j] += Math.abs(newAngle[j]-prevAngle[j]);
 		    }
@@ -180,43 +181,29 @@ public class Nbody {
 		    if (Math.signum(prevAngle[j]) < Math.signum(newAngle[j])) {
 			angleDiff[j] += (newAngle[j] + Math.abs(prevAngle[j]));
 		    }
-
 		    else if (Math.signum(prevAngle[j]) > Math.signum(newAngle[j])) {
 			angleDiff[j] += (2*Math.PI + (newAngle[j] - prevAngle[j]));
 		    }
-
 		    else {
 			angleDiff[j] += Math.abs(newAngle[j]-prevAngle[j]);
 		    }
 		}
 	    }
-	    stepNumber++;	    
 
-
+	    /*
+	     * End of orbit counter
+	     */
+	    
 	}
 
-	/*
-	  Counting orbits: compute the angular position of the starting point
-	  than monitor at every timestep, stop the calculation when back
-	  at the start; use Math.atan2(y,x)
-	  Need to determine angular direction first 
-	 
-	  METHODS: counterclockwise
-
-	  Another idea is to test when x-coord is positive for change of sign in y
-	  But this will count only full orbits
-
-
-	  Perihelion/Aphelion - just test for min/max separattion between planet and the Sun
-	
-
-
-	  Need to print values of aphelion and perihelion for each body
-	*/
-
+	// Console output
 	System.out.printf("\nEnergy fluctuation: %e\nThe ratio is %e\n\n", maxEnergy-minEnergy, Math.abs((maxEnergy-minEnergy)/((minEnergy+maxEnergy)/2)) );
+	System.out.printf("Number of Sun orbits %f\n", angleDiff[0]/(2*Math.PI));
+	System.out.printf("Number of Mercury orbits %f\n", angleDiff[1]/(2*Math.PI));
+	System.out.printf("Number of Venus orbits %f\n\n", angleDiff[2]/(2*Math.PI));
+	System.out.printf("Mercury orbit time in days %f\n", time/3600/24/(angleDiff[1]/(2*Math.PI)));
+	System.out.printf("Venus orbit time in days %f\n\n", time/3600/24/(angleDiff[2]/(2*Math.PI)));
 
-	System.out.printf("Number of Venus orbits %f\n", angleDiff[2]/(2*Math.PI));
 
 	// Close the output file
 	output.close();

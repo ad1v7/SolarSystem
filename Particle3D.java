@@ -19,6 +19,8 @@ public class Particle3D  {
 
     static double G = 6.67408e-11;
 
+    // units of AU, years and solar masses:
+    // static double G = 4.0*Math.PI*Math.PI;
     /* 
      * Constructors
      *
