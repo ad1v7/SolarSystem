@@ -66,47 +66,42 @@ public class Nbody {
 	
 	// calculate initial forces
 	Particle3D.updateForce(particleArray, currentForceArray);
-	
-	/*
-	 * Start of the Verlet algorithm
-	 */
-	
+		
 	//Prints the initial position to file
 	int stepNumber = 1;
 	output.printf(Particle3D.vmd(particleArray, stepNumber));
 	stepNumber++;
 
 
-	double currentAngle = 0;
-	double initPosAngle = 0;
-	double initVelAngle = 0;
-	double orbitDirectionTest = 0;
+	double newAngle[] = new double[numberOfParticles];
+	double prevAngle[] = new double[numberOfParticles];
+	double angleDiff[] = new double[numberOfParticles]; 
 
-	/*
-	 * Loop over timesteps
-	 */
 	double minEnergy = Particle3D.sysEnergy(particleArray);
 	double maxEnergy = Particle3D.sysEnergy(particleArray);
 	double energy;
 
-	initPosAngle = Math.atan2(particleArray[0].getPosition().getY(), particleArray[0].getPosition().getX());
-	initVelAngle = Math.atan2(particleArray[0].getVelocity().getY(), particleArray[0].getVelocity().getX());
-	// make sure angle is in (0,2*PI) interval
 
-	if (initPosAngle < 0) {
-	    initPosAngle += 2*Math.PI;
+	// determine clockwise/anitclockwise orbits
+	boolean clockwise[] = new boolean[numberOfParticles];
+	for (int j=0; j<numberOfParticles; j++) {
+	if ( Vector3D.vecCross(particleArray[j].getPosition(),particleArray[j].getVelocity()).getZ() > 0) {
+	    clockwise[j] = false;
 	}
-	else if (initVelAngle < 0) {
-	    initVelAngle += 2*Math.PI;
+	else { clockwise[j] = true; }
 	}
-	// ehmmmm??? think again...
-	orbitDirectionTest = initPosAngle + initVelAngle; // this is not good
 
-	System.out.printf("%e\n", initPosAngle);
+	/* 
+	 * Start of the Verlet Algorithm
+	 *
+	 */
 
 	for (int i=0; i<numberOfSteps; i++) {
 
-
+	    // calc initial angles before the position updatde
+	    for (int j=0; j<numberOfParticles; j++) {
+		prevAngle[j] = Math.atan2(particleArray[j].getPosition().getY(), particleArray[j].getPosition().getX());
+	    }
 
 	    // Update the position using current velocity
 	    Particle3D.leapPosition(stepSize, particleArray, currentForceArray);
@@ -131,40 +126,69 @@ public class Nbody {
 	    if (i % printFrequency == 0) {	   
 		output.printf(Particle3D.vmd(particleArray, stepNumber));
 
-	    energy = Particle3D.sysEnergy(particleArray);
-	    if (minEnergy > energy) { minEnergy = energy;  }
-	    if (maxEnergy < energy) { maxEnergy = energy;  }	
-	}
-
-	currentAngle = Math.atan2(particleArray[2].getPosition().getY(), particleArray[2].getPosition().getX());
-	// make sure angle is in (0,2*PI) interval
-	if (currentlAngle < 0) {
-	    currentAngle += 2*Math.PI;
-	}
+		energy = Particle3D.sysEnergy(particleArray);
+		if (minEnergy > energy) { minEnergy = energy;  }
+		if (maxEnergy < energy) { maxEnergy = energy;  }	
+	    }
 
 
+	    // count orbits
+	    for (int j=0; j<numberOfParticles; j++) {
+	    newAngle[j] = Math.atan2(particleArray[j].getPosition().getY(), particleArray[j].getPosition().getX());
 
+		if (clockwise[j] == true) {
+
+		    if (Math.signum(prevAngle[j]) > Math.signum(newAngle[j])) {
+			angleDiff[j] += (Math.abs(newAngle[j]) + prevAngle[j]);
+		    }
+
+		    else if (Math.signum(prevAngle[j]) < Math.signum(newAngle[j])) {
+			angleDiff[j] += (2*Math.PI -(newAngle[j] - prevAngle[j]));
+		    }
+
+		    else {
+		    angleDiff[j] += Math.abs(newAngle[j]-prevAngle[j]);
+		    }
+		}
+
+		// anticlockwise case
+		else {		  
+		    if (Math.signum(prevAngle[j]) < Math.signum(newAngle[j])) {
+			angleDiff[j] += (newAngle[j] + Math.abs(prevAngle[j]));
+		    }
+
+		    else if (Math.signum(prevAngle[j]) > Math.signum(newAngle[j])) {
+			angleDiff[j] += (2*Math.PI + (newAngle[j] - prevAngle[j]));
+		    }
+
+		    else {
+		    angleDiff[j] += Math.abs(newAngle[j]-prevAngle[j]);
+		    }
+		}
+	    }
 	    stepNumber++;	    
 
 
 	}
 
 	/*
-	 Counting orbits: compute the angular position of the starting point
-	 than monitor at every timestep, stop the calculation when back
-	 at the start; use Math.atan2(y,x)
-	 Need to determine angular direction first 
+	  Counting orbits: compute the angular position of the starting point
+	  than monitor at every timestep, stop the calculation when back
+	  at the start; use Math.atan2(y,x)
+	  Need to determine angular direction first 
 	 
-	 METHODS: counterclockwise
+	  METHODS: counterclockwise
 
-	 Another idea is to test when x-coord is positive for change of sign in y
-	 But this will count only full orbits
+	  Another idea is to test when x-coord is positive for change of sign in y
+	  But this will count only full orbits
 
-	 Perihelion/Aphelion - just test for min/max separattion between planet and the Sun
+	  Perihelion/Aphelion - just test for min/max separattion between planet and the Sun
 	*/
 
 
-	System.out.printf("\nEnergy fluctuation: %e\nThe ratio is %e\n\n", maxEnergy-minEnergy, (maxEnergy-minEnergy)/((minEnergy+maxEnergy)/2) );
+	System.out.printf("\nEnergy fluctuation: %e\nThe ratio is %e\n\n", maxEnergy-minEnergy, Math.abs((maxEnergy-minEnergy)/((minEnergy+maxEnergy)/2)) );
+
+	System.out.printf("Number of Venus orbits %f\n", angleDiff[2]/(2*Math.PI));
 
 	// Close the output file
 	output.close();
