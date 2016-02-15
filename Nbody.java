@@ -95,8 +95,8 @@ public class Nbody {
 	double energy;
 
 	// Arrays of doubles to store values of aphelions and periphelions for each body
-	double aphelionArray[] = new double[numberOfParticles - 1];
-	double perihelionArray[] = new double[numberOfParticles - 1];
+	double aphelionArray[] = new double[numberOfParticles];
+	double perihelionArray[] = new double[numberOfParticles];
 
 	initPosAngle = Math.atan2(particleArray[0].getPosition().getY(), particleArray[0].getPosition().getX());
 	initVelAngle = Math.atan2(particleArray[0].getVelocity().getY(), particleArray[0].getVelocity().getX());
