@@ -292,9 +292,9 @@ public class Particle3D  {
 	double energy = 0;
 	for (int i=0; i<p.length; i++) {
 	    for (int j=i+1; j<p.length; j++) {
-		energy = energy + potEnergy(p[i],p[j]);
+		energy += potEnergy(p[i],p[j]);
 	    }
-	    energy = energy + kEnergy(p[i]);
+	    energy += kEnergy(p[i]);
 	}
 	return energy;
     }

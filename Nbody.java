@@ -89,6 +89,10 @@ public class Nbody {
 	double maxEnergy = Particle3D.sysEnergy(particleArray);
 	double energy;
 
+	// Arrays of doubles to store values of aphelions and periphelions for each body
+	double aphelionArray[] = new double[numberOfParticles - 1];
+	double perihelionArray[] = new double[numberOfParticles - 1];
+
 	initPosAngle = Math.atan2(particleArray[0].getPosition().getY(), particleArray[0].getPosition().getX());
 	initVelAngle = Math.atan2(particleArray[0].getVelocity().getY(), particleArray[0].getVelocity().getX());
 	// make sure angle is in (0,2*PI) interval
@@ -106,8 +110,6 @@ public class Nbody {
 
 	for (int i=0; i<numberOfSteps; i++) {
 
-
-
 	    // Update the position using current velocity
 	    Particle3D.leapPosition(stepSize, particleArray, currentForceArray);
 
@@ -122,6 +124,12 @@ public class Nbody {
 		currentForceArray[j] = new Vector3D(newForceArray[j]);
 		newForceArray[j] = new Vector3D();
 	    }
+
+	  
+	    // Calculate aphelion and perihelion for each body in the simulation
+	    double separation = Particle3D.pSep(particleArray[0], particleArray[i]).mag();
+	    if (aphelionArray[i] < separation) {aphelionArray[i] = separation; }
+	    if (perihelionArray[i] > separation) {perihelionArray[i] = separation; }
 
 	    // Increase the time
 	    time = time + stepSize;
@@ -138,13 +146,13 @@ public class Nbody {
 
 	currentAngle = Math.atan2(particleArray[2].getPosition().getY(), particleArray[2].getPosition().getX());
 	// make sure angle is in (0,2*PI) interval
-	if (currentlAngle < 0) {
+	if (currentAngle < 0) {
 	    currentAngle += 2*Math.PI;
 	}
 
+ 
 
-
-	    stepNumber++;	    
+	    stepNumber++;           
 
 
 	}
@@ -161,8 +169,9 @@ public class Nbody {
 	 But this will count only full orbits
 
 	 Perihelion/Aphelion - just test for min/max separattion between planet and the Sun
-	*/
 
+Need to print values of aphelion and perihelion for each body
+	*/
 
 	System.out.printf("\nEnergy fluctuation: %e\nThe ratio is %e\n\n", maxEnergy-minEnergy, (maxEnergy-minEnergy)/((minEnergy+maxEnergy)/2) );
 
