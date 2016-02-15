@@ -21,7 +21,7 @@ public class Nbody {
 	// NEED TO GENERALIZE: INPUT PARAM FROM A FILE
 
 	// Number of timesteps
-	double numberOfSteps = 1000000;
+	double numberOfSteps = 10000000;
 
 	// Size of timestep
 	double stepSize = 10;
@@ -76,11 +76,37 @@ public class Nbody {
 	output.printf(Particle3D.vmd(particleArray, stepNumber));
 	stepNumber++;
 
+
+	double currentAngle = 0;
+	double initPosAngle = 0;
+	double initVelAngle = 0;
+	double orbitDirectionTest = 0;
+
 	/*
 	 * Loop over timesteps
 	 */
+	double minEnergy = Particle3D.sysEnergy(particleArray);
+	double maxEnergy = Particle3D.sysEnergy(particleArray);
+	double energy;
+
+	initPosAngle = Math.atan2(particleArray[0].getPosition().getY(), particleArray[0].getPosition().getX());
+	initVelAngle = Math.atan2(particleArray[0].getVelocity().getY(), particleArray[0].getVelocity().getX());
+	// make sure angle is in (0,2*PI) interval
+
+	if (initPosAngle < 0) {
+	    initPosAngle += 2*Math.PI;
+	}
+	else if (initVelAngle < 0) {
+	    initVelAngle += 2*Math.PI;
+	}
+	// ehmmmm??? think again...
+	orbitDirectionTest = initPosAngle + initVelAngle; // this is not good
+
+	System.out.printf("%e\n", initPosAngle);
 
 	for (int i=0; i<numberOfSteps; i++) {
+
+
 
 	    // Update the position using current velocity
 	    Particle3D.leapPosition(stepSize, particleArray, currentForceArray);
@@ -101,13 +127,45 @@ public class Nbody {
 	    time = time + stepSize;
 
 	    // Prints every k-th position to VMD file
+	    // calc min and max energy every k-th step to save on calc
 	    if (i % printFrequency == 0) {	   
 		output.printf(Particle3D.vmd(particleArray, stepNumber));
-		//	System.out.printf("%20.20e\n", Particle3D.sysEnergy(particleArray));
-	    }
-	    stepNumber++;	    
+
+	    energy = Particle3D.sysEnergy(particleArray);
+	    if (minEnergy > energy) { minEnergy = energy;  }
+	    if (maxEnergy < energy) { maxEnergy = energy;  }	
 	}
-  
+
+	currentAngle = Math.atan2(particleArray[2].getPosition().getY(), particleArray[2].getPosition().getX());
+	// make sure angle is in (0,2*PI) interval
+	if (currentlAngle < 0) {
+	    currentAngle += 2*Math.PI;
+	}
+
+
+
+	    stepNumber++;	    
+
+
+	}
+
+	/*
+	 Counting orbits: compute the angular position of the starting point
+	 than monitor at every timestep, stop the calculation when back
+	 at the start; use Math.atan2(y,x)
+	 Need to determine angular direction first 
+	 
+	 METHODS: counterclockwise
+
+	 Another idea is to test when x-coord is positive for change of sign in y
+	 But this will count only full orbits
+
+	 Perihelion/Aphelion - just test for min/max separattion between planet and the Sun
+	*/
+
+
+	System.out.printf("\nEnergy fluctuation: %e\nThe ratio is %e\n\n", maxEnergy-minEnergy, (maxEnergy-minEnergy)/((minEnergy+maxEnergy)/2) );
+
 	// Close the output file
 	output.close();
 
