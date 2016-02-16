@@ -52,8 +52,8 @@ public class Nbody {
 	    totLinMom = Vector3D.vecAdd(totLinMom, particleArray[i].getVelocity().scalMul(particleArray[i].getMass()));
 	    systemMass += particleArray[i].getMass();
 	}
-	System.out.printf("\nUncorrected Total Linear Momentum: %1.2e [M☉*AU/day]\n", totLinMom.mag());
-	System.out.printf("Total Mass of The System: %1.8e [M☉]\n", systemMass);
+	System.out.printf("\nUncorrected Total Linear Momentum: %1.2e M☉ AU/day\n", totLinMom.mag());
+	System.out.printf("Total Mass of The System: %1.8e M☉\n", systemMass);
 
 	// Calculate Centre of Mass velocity
 	Vector3D centreOfMass = new Vector3D(totLinMom.scalDiv(systemMass));
@@ -68,8 +68,7 @@ public class Nbody {
 	for (int i=0; i<numberOfParticles; i++) {
 	    totLinMom = Vector3D.vecAdd(totLinMom, particleArray[i].getVelocity().scalMul(particleArray[i].getMass()));
 	}
-	System.out.printf("Corrected Total Linear Momentum: %1.2e [M☉*AU/day]\n", totLinMom.mag());
-
+	System.out.printf("Corrected Total Linear Momentum: %1.2e M☉ AU/day\n", totLinMom.mag());
 	
 	/* 
 	 * End of CoM correction
@@ -115,7 +114,7 @@ public class Nbody {
 	double prevAngle[] = new double[numberOfParticles];
 	double angleDiff[] = new double[numberOfParticles]; 
 
-	// doubles for energy fluctuations calculations
+	// doubles for energy fluctuation calculation
 	double minEnergy = Particle3D.sysEnergy(particleArray);
 	double maxEnergy = Particle3D.sysEnergy(particleArray);
 	double energy;
@@ -124,6 +123,12 @@ public class Nbody {
 	double aphelionArray[] = new double[numberOfParticles];
 	double perihelionArray[] = new double[numberOfParticles];
 
+	// Calculate min/max distance for first time step
+	    for (int j=1; j < numberOfParticles; j++) {
+		double separation = Particle3D.pSep(particleArray[0], particleArray[j]).mag();
+		aphelionArray[j] = separation;
+		perihelionArray[j] = separation;
+	    }
 	// determine clockwise/anitclockwise orbits for each body
 	boolean clockwise[] = new boolean[numberOfParticles];
 	for (int j=0; j<numberOfParticles; j++) {
@@ -175,8 +180,8 @@ public class Nbody {
 
 	    for (int j=1; j < numberOfParticles; j++) {
 		double separation = Particle3D.pSep(particleArray[0], particleArray[j]).mag();
-		if (aphelionArray[j] < separation) {aphelionArray[j] = separation; }
-		else if (perihelionArray[j] > separation) {perihelionArray[j] = separation; }
+		if (aphelionArray[j] < separation) { aphelionArray[j] = separation; }
+		else if (perihelionArray[j] > separation) { perihelionArray[j] = separation; }
 	    }
 
 	    // Prints every k-th position to VMD file
@@ -234,18 +239,19 @@ public class Nbody {
 	 */
 
 	// Console output
-	System.out.printf("\nEnergy fluctuation: %e\nThe ratio is %e\n\n", maxEnergy-minEnergy, -(maxEnergy-minEnergy)/((minEnergy+maxEnergy)/2) );
+	System.out.printf("\nEnergy fluctuation: %1.2e\nThe ratio is %1.2e\n\n", maxEnergy-minEnergy, -(maxEnergy-minEnergy)/((minEnergy+maxEnergy)/2) );
 
+	System.out.println("Kepler's 3rd Law verification:");
 	for (int i=1; i<numberOfParticles; i++) {
-	    System.out.printf("Number of %s orbits: %f\n", particleArray[i].getLabel(), angleDiff[i]/(2*Math.PI));
+	    System.out.printf("T^2= %f == %f = a^3\n", Math.pow(time/(angleDiff[i]/(2*Math.PI))/365.25,2), Math.pow((perihelionArray[i]+aphelionArray[i])/2,3) );
 	}
 
-	System.out.println("\n");
-
-	System.out.format("%15s%15s%20s%15s%15s\n", "Body Name", "Mass/M☉", "Orbit time/days", "Aphelion/AU", "Perihelion/AU");
-	for(int i=0; i<numberOfParticles; i++) {
-	    System.out.format("%15s%15.3e%20.3f%15.4f%15.4f\n", particleArray[i].getLabel(),particleArray[i].getMass() , time/(angleDiff[i]/(2*Math.PI)) , aphelionArray[i], perihelionArray[i]);
+	System.out.format("\n%10s%11s%13s%14s%15s%15s\n", "Body Name", "Mass/M☉", "Orbit/days", "Aphelion/AU", "Perihelion/AU", "Orbit/⊕ ratio");
+	for(int i=1; i<numberOfParticles; i++) {
+	    System.out.format("%10s%11.2e%13.5f%14.7f%15.7f%15.4f\n", particleArray[i].getLabel(),particleArray[i].getMass() , time/(angleDiff[i]/(2*Math.PI)) , aphelionArray[i], perihelionArray[i], time/(angleDiff[i]/(2*Math.PI))/365.25);
 	}
+
+
 
 	// Close the output file
 	output.close();
