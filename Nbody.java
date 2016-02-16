@@ -18,38 +18,40 @@ public class Nbody {
 
     public static void main (String[] argv) throws IOException {
 
-	// Opens the input failing containing particles
-	String particle_file = argv[0];
+	// Open the input file containing particles
+	String particleFile = argv[0];
 
 	// Count number of particles in an input file
-	BufferedReader reader = new BufferedReader(new FileReader(particle_file));
+	BufferedReader particleBuff = new BufferedReader(new FileReader(particleFile));
 	int numberOfParticles = 0;
-	while (reader.readLine() != null) {
+	while (particleBuff.readLine() != null) {
 	    numberOfParticles++;
 	}
-	reader.close();
+	particleBuff.close();
 
 	// Attach a scanner to the input file
-	BufferedReader p_file = new BufferedReader(new FileReader(particle_file));
-	Scanner scan = new Scanner(p_file);
+	particleBuff = new BufferedReader(new FileReader(particleFile));
+	Scanner scanParticles = new Scanner(particleBuff);
 
 	// Create new array of Particles3D and copy particles from an input file
 	Particle3D particleArray[] = new Particle3D[numberOfParticles];
-	for (int i=0; scan.hasNext(); i++) {
-	    particleArray[i] = Particle3D.pScanner(scan);
+	for (int i=0; scanParticles.hasNext(); i++) {
+	    particleArray[i] = Particle3D.pScanner(scanParticles);
 	}
-	
-	// Opens the second input file containing parameters: number of steps, size of timestep,
-	// initial time, print frequency
-	String param_file = argv[1];
+	scanParticles.close();	
 
-	// Attach a scanner to the second input file
-	BufferedReader par_file = new BufferedReader(new FileReader(param_file));
-	Scanner scan2 = new Scanner(par_file);
-	double numberOfSteps = scan2.nextDouble();
-	double stepSize = scan2.nextDouble();
-	double time = scan2.nextDouble();
-	int printFrequency = scan2.nextInt();
+	// Open the second input file containing parameters: number of steps, size of timestep,
+	// initial time, print frequency
+	String paramFile = argv[1];
+
+	// Attach a scanner to the parameter input file
+	BufferedReader paramBuff = new BufferedReader(new FileReader(paramFile));
+	Scanner scanParam = new Scanner(paramBuff);
+	double numberOfSteps = scanParam.nextDouble();
+	double stepSize = scanParam.nextDouble();
+	double time = scanParam.nextDouble();
+	int printFrequency = scanParam.nextInt();
+	scanParam.close();
 
 	// Opens the output file
 	String outFile = argv[2];
@@ -68,7 +70,7 @@ public class Nbody {
 	// calculate initial forces
 	Particle3D.updateForce(particleArray, currentForceArray);
 		
-	//Prints the initial position to file
+	//Prints the initial positions to the output file
 	int stepNumber = 1;
 	output.printf(Particle3D.vmd(particleArray, stepNumber));
 	stepNumber++;
@@ -83,14 +85,14 @@ public class Nbody {
 	double maxEnergy = Particle3D.sysEnergy(particleArray);
 	double energy;
 
-	// Arrays of doubles to store values of aphelions and periphelions for each body
+	// Arrays of doubles to store values of aphelion and perihelion for each body
 	double aphelionArray[] = new double[numberOfParticles];
 	double perihelionArray[] = new double[numberOfParticles];
 
-	// determine clockwise/anitclockwise orbits
+	// determine clockwise/anitclockwise orbits for each body
 	boolean clockwise[] = new boolean[numberOfParticles];
 	for (int j=0; j<numberOfParticles; j++) {
-	    if ( Vector3D.vecCross(particleArray[j].getPosition(),particleArray[j].getVelocity()).getZ() > 0) {
+	    if (Vector3D.vecCross(particleArray[j].getPosition(),particleArray[j].getVelocity()).getZ() > 0) {
 		clockwise[j] = false;
 	    }
 	    else { clockwise[j] = true; }
@@ -103,8 +105,7 @@ public class Nbody {
 
 	for (int i=0; i<numberOfSteps; i++) {
 
-
-	    // calc initial angles before the position updatde
+	    // calc initial angles before the position update
 	    for (int j=0; j<numberOfParticles; j++) {
 		prevAngle[j] = Math.atan2(particleArray[j].getPosition().getY(), particleArray[j].getPosition().getX());
 	    }
@@ -128,12 +129,12 @@ public class Nbody {
 		newForceArray[j] = new Vector3D();
 	    }
 
-	    // Increase the time and step number
+	    // Increase the time
 	    time = time + stepSize;
-	    stepNumber++;
+
 
 	    /*
-	     *  end of Verlet Algorithm
+	     *  end of the Verlet Algorithm
 	     */
 
 	    // Calculate aphelion and perihelion for each body in the simulation
@@ -155,7 +156,6 @@ public class Nbody {
 		if (minEnergy > energy) { minEnergy = energy;  }
 		if (maxEnergy < energy) { maxEnergy = energy;  }	
 	    }
-
 
 	    /*
 	     * Start of orbit counter
@@ -193,16 +193,26 @@ public class Nbody {
 	    /*
 	     * End of orbit counter
 	     */
-	    
+
+	    stepNumber++;
 	}
+
+	/*
+	 * End of loop over timesteps
+	 */
 
 	// Console output
 	System.out.printf("\nEnergy fluctuation: %e\nThe ratio is %e\n\n", maxEnergy-minEnergy, Math.abs((maxEnergy-minEnergy)/((minEnergy+maxEnergy)/2)) );
-	System.out.printf("Number of Sun orbits %f\n", angleDiff[0]/(2*Math.PI));
-	System.out.printf("Number of Mercury orbits %f\n", angleDiff[1]/(2*Math.PI));
-	System.out.printf("Number of Venus orbits %f\n\n", angleDiff[2]/(2*Math.PI));
-	System.out.printf("Mercury orbit time in days %f\n", time/3600/24/(angleDiff[1]/(2*Math.PI)));
-	System.out.printf("Venus orbit time in days %f\n\n", time/3600/24/(angleDiff[2]/(2*Math.PI)));
+
+	for (int i=0; i<numberOfParticles; i++) {
+	    System.out.printf("Number of %s orbits: %f\n", particleArray[i].getLabel(), angleDiff[i]/(2*Math.PI));
+	}
+
+	System.out.println("\n");
+
+	for (int i=0; i<numberOfParticles; i++) {
+	    System.out.printf("%s orbit time: %f\n", particleArray[i].getLabel(), time/3600/24/(angleDiff[i]/(2*Math.PI)));
+	}
 
 
 	// Close the output file
