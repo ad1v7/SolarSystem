@@ -17,10 +17,13 @@ public class Particle3D  {
     private Vector3D position;
     private Vector3D velocity;
 
-    static double G = 6.67408e-11;
+    // SI units
+    //  static double G = 6.67408e-11;
 
-    // units of AU, years and solar masses:
-    // static double G = 4.0*Math.PI*Math.PI;
+    // units of AU, days and solar masses:
+    static double G = 0.0002959122083;
+
+
     /* 
      * Constructors
      *

@@ -40,6 +40,39 @@ public class Nbody {
 	}
 	scanParticles.close();	
 
+	/*
+	 *  Adjust velocities of all Particles so the CoM = 0
+	 */
+
+	// Calc total linear momentum and mass of the system
+	double systemMass = 0.0;
+	Vector3D totLinMom = new Vector3D();
+
+	for (int i=0; i<numberOfParticles; i++) {
+	    totLinMom = Vector3D.vecAdd(totLinMom, particleArray[i].getVelocity().scalMul(particleArray[i].getMass()));
+	    systemMass += particleArray[i].getMass();
+	}
+	System.out.printf("\nUncorrected total linear momentum is: %s\n", totLinMom);
+
+	// Calculate Centre of Mass velocity
+	Vector3D centreOfMass = new Vector3D(totLinMom.scalDiv(systemMass));
+	System.out.printf("\nCentre of mass velocity is: %s\n", centreOfMass);
+
+	// Correct particle velocities by CoM velocity
+	for (int i=0; i<numberOfParticles; i++) {
+	    particleArray[i].setVelocity(Vector3D.vecSub(particleArray[i].getVelocity(), centreOfMass));
+	}
+
+	// Recalculate total linear momentum and print
+	totLinMom = new Vector3D();
+	for (int i=0; i<numberOfParticles; i++) {
+	    totLinMom = Vector3D.vecAdd(totLinMom, particleArray[i].getVelocity().scalMul(particleArray[i].getMass()));
+	    System.out.printf("Corrected Velocities: %s\n", particleArray[i].getVelocity());
+	}
+	System.out.printf("\nCorrected total linear momentum is: %s\n", totLinMom);
+	System.out.printf("\nTotal mass of the system is: %1.10e\n", systemMass);
+
+
 	// Open the second input file containing parameters: number of steps, size of timestep,
 	// initial time, print frequency
 	String paramFile = argv[1];
