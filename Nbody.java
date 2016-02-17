@@ -37,8 +37,9 @@ public class Nbody {
 	particleBuff = new BufferedReader(new FileReader(particleFile));
 	Scanner scanParticles = new Scanner(particleBuff);
 
-	int earthIndex =0;
 	// Create new array of Particles3D and copy particles from an input file
+	// Find array index of Earth; used later for Moon orbit calculations
+	int earthIndex =0;
 	Particle3D particleArray[] = new Particle3D[numberOfParticles];
 	for (int i=0; scanParticles.hasNext(); i++) {
 	    particleArray[i] = Particle3D.pScanner(scanParticles);
@@ -51,7 +52,7 @@ public class Nbody {
 	/*
 	 *  Adjust velocities of all Particles so the CoM = 0
 	 */
-	
+
 	// Calc total linear momentum and mass of the system
 	double systemMass = 0.0;
 	Vector3D totLinMom = new Vector3D();
@@ -77,7 +78,7 @@ public class Nbody {
 	    totLinMom = Vector3D.vecAdd(totLinMom, particleArray[i].getVelocity().scalMul(particleArray[i].getMass()));
 	}
 	System.out.printf("Corrected Total Linear Momentum: %1.2e M☉ AU/day\n", totLinMom.mag());
-	
+
 	/* 
 	 * End of CoM correction
 	 */
@@ -156,7 +157,7 @@ public class Nbody {
 
 	for (int i=0; i<numberOfSteps; i++) {
 
-	    // calc initial angles before the position update
+	    // calc initial angles before the position update for orbit calculation
 	    for (int j=0; j<numberOfParticles; j++) {
 		if (particleArray[j].getLabel().equals("Moon")) {
 		    prevAngle[j] = Math.atan2(particleArray[earthIndex].getPosition().getY()-particleArray[j].getPosition().getY(), particleArray[earthIndex].getPosition().getX()-particleArray[j].getPosition().getX());
@@ -215,7 +216,7 @@ public class Nbody {
 	     */
 
 	    for (int j=0; j<numberOfParticles; j++) {
-	
+
 		if (particleArray[j].getLabel().equals("Moon")) {
 		    newAngle[j] = Math.atan2(particleArray[earthIndex].getPosition().getY()-particleArray[j].getPosition().getY(), particleArray[earthIndex].getPosition().getX()-particleArray[j].getPosition().getX());
 		}
