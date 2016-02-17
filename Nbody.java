@@ -15,6 +15,10 @@ import java.util.Scanner;
 import java.lang.*;
 
 public class Nbody {
+    // SI units
+    //  static double G = 6.67408e-11;
+    // units of AU, days and solar masses:
+    public static double G = 0.0002959122083;
 
     public static void main (String[] argv) throws IOException {
 
@@ -90,7 +94,7 @@ public class Nbody {
 	// Opens the output file
 	String outFile = argv[2];
         PrintWriter output = new PrintWriter(new FileWriter(outFile));
-		
+	
 	// Set up arrays which store forces
 	Vector3D currentForceArray[] = new Vector3D[numberOfParticles];
 	Vector3D newForceArray[] = new Vector3D[numberOfParticles];
@@ -129,6 +133,7 @@ public class Nbody {
 		aphelionArray[j] = separation;
 		perihelionArray[j] = separation;
 	    }
+
 	// determine clockwise/anitclockwise orbits for each body
 	boolean clockwise[] = new boolean[numberOfParticles];
 	for (int j=0; j<numberOfParticles; j++) {
@@ -177,7 +182,6 @@ public class Nbody {
 	     */
 
 	    // Calculate aphelion and perihelion for each body in the simulation
-
 	    for (int j=1; j < numberOfParticles; j++) {
 		double separation = Particle3D.pSep(particleArray[0], particleArray[j]).mag();
 		if (aphelionArray[j] < separation) { aphelionArray[j] = separation; }
@@ -185,7 +189,7 @@ public class Nbody {
 	    }
 
 	    // Prints every k-th position to VMD file
-	    // calc min and max energy every k-th step to save on calc
+	    // Calc min and max energy every k-th step to save on calc
 	    if (i % printFrequency == 0) {	   
 		output.printf(Particle3D.vmd(particleArray, stepNumber));
 
@@ -251,10 +255,7 @@ public class Nbody {
 	    System.out.format("%10s%11.2e%13.5f%14.7f%15.7f%15.4f\n", particleArray[i].getLabel(),particleArray[i].getMass() , time/(angleDiff[i]/(2*Math.PI)) , aphelionArray[i], perihelionArray[i], time/(angleDiff[i]/(2*Math.PI))/365.25);
 	}
 
-
-
 	// Close the output file
 	output.close();
-
     }
 }

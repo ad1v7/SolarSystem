@@ -17,12 +17,6 @@ public class Particle3D  {
     private Vector3D position;
     private Vector3D velocity;
 
-    // SI units
-    //  static double G = 6.67408e-11;
-
-    // units of AU, days and solar masses:
-    static double G = 0.0002959122083;
-
 
     /* 
      * Constructors
@@ -196,7 +190,7 @@ public class Particle3D  {
 	double r = pSep(p1,p2).magSq();
 	if  (r == 0) { return 0.0; }
 	else {
-	    return G * p1.getMass() * p2.getMass() / r;
+	    return Nbody.G * p1.getMass() * p2.getMass() / r;
 	}
     }
 
@@ -228,7 +222,7 @@ public class Particle3D  {
      * @return potential energy of p1 and p2
      */
     public static double potEnergy(Particle3D p1, Particle3D p2) {
-	return -G * p1.getMass() * p2.getMass() / pSep(p1,p2).mag();  }
+	return -Nbody.G * p1.getMass() * p2.getMass() / pSep(p1,p2).mag();  }
 
     /** Total energy of two Particle3D
      * as a sum of kinetic and potential energies
