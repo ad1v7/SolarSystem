@@ -15,10 +15,10 @@ import java.util.Scanner;
 import java.lang.*;
 
 public class Nbody {
-    // SI units
-    //  static double G = 6.67408e-11;
+    
     // units of AU, days and solar masses:
-    public static double G = 0.0002959122083;
+    public static double G;
+    public static double YEAR;
 
     public static void main (String[] argv) throws IOException {
 
@@ -37,10 +37,14 @@ public class Nbody {
 	particleBuff = new BufferedReader(new FileReader(particleFile));
 	Scanner scanParticles = new Scanner(particleBuff);
 
+	int earthIndex =0;
 	// Create new array of Particles3D and copy particles from an input file
 	Particle3D particleArray[] = new Particle3D[numberOfParticles];
 	for (int i=0; scanParticles.hasNext(); i++) {
 	    particleArray[i] = Particle3D.pScanner(scanParticles);
+	    if (particleArray[i].getLabel().equals("Earth")) {
+		earthIndex=i;
+	    }
 	}
 	scanParticles.close();	
 
@@ -89,6 +93,8 @@ public class Nbody {
 	double stepSize = scanParam.nextDouble();
 	double time = scanParam.nextDouble();
 	int printFrequency = scanParam.nextInt();
+	G = Math.pow(scanParam.nextDouble(),2);
+	YEAR = scanParam.nextDouble();
 	scanParam.close();
 
 	// Opens the output file
@@ -128,11 +134,11 @@ public class Nbody {
 	double perihelionArray[] = new double[numberOfParticles];
 
 	// Calculate min/max distance for first time step
-	    for (int j=1; j < numberOfParticles; j++) {
-		double separation = Particle3D.pSep(particleArray[0], particleArray[j]).mag();
-		aphelionArray[j] = separation;
-		perihelionArray[j] = separation;
-	    }
+	for (int j=1; j < numberOfParticles; j++) {
+	    double separation = Particle3D.pSep(particleArray[0], particleArray[j]).mag();
+	    aphelionArray[j] = separation;
+	    perihelionArray[j] = separation;
+	}
 
 	// determine clockwise/anitclockwise orbits for each body
 	boolean clockwise[] = new boolean[numberOfParticles];
@@ -152,7 +158,13 @@ public class Nbody {
 
 	    // calc initial angles before the position update
 	    for (int j=0; j<numberOfParticles; j++) {
-		prevAngle[j] = Math.atan2(particleArray[j].getPosition().getY(), particleArray[j].getPosition().getX());
+		if (particleArray[j].getLabel().equals("Moon")) {
+		    prevAngle[j] = Math.atan2(particleArray[earthIndex].getPosition().getY()-particleArray[j].getPosition().getY(), particleArray[earthIndex].getPosition().getX()-particleArray[j].getPosition().getX());
+		}
+		else {
+		    prevAngle[j] = Math.atan2(particleArray[j].getPosition().getY(), particleArray[j].getPosition().getX());
+		}
+
 	    }
 
 	    /*
@@ -203,7 +215,13 @@ public class Nbody {
 	     */
 
 	    for (int j=0; j<numberOfParticles; j++) {
-		newAngle[j] = Math.atan2(particleArray[j].getPosition().getY(), particleArray[j].getPosition().getX());
+	
+		if (particleArray[j].getLabel().equals("Moon")) {
+		    newAngle[j] = Math.atan2(particleArray[earthIndex].getPosition().getY()-particleArray[j].getPosition().getY(), particleArray[earthIndex].getPosition().getX()-particleArray[j].getPosition().getX());
+		}
+		else {
+		    newAngle[j] = Math.atan2(particleArray[j].getPosition().getY(), particleArray[j].getPosition().getX());
+		}
 
 		if (clockwise[j] == true) {
 		    if (Math.signum(prevAngle[j]) > Math.signum(newAngle[j])) {
@@ -247,12 +265,12 @@ public class Nbody {
 
 	System.out.println("Kepler's 3rd Law verification:");
 	for (int i=1; i<numberOfParticles; i++) {
-	    System.out.printf("T^2= %f == %f = a^3\n", Math.pow(time/(angleDiff[i]/(2*Math.PI))/365.25,2), Math.pow((perihelionArray[i]+aphelionArray[i])/2,3) );
+	    System.out.printf("T^2= %f == %f = a^3\n", Math.pow(time/(angleDiff[i]/(2*Math.PI))/YEAR,2), Math.pow((perihelionArray[i]+aphelionArray[i])/2,3) );
 	}
 
 	System.out.format("\n%10s%11s%13s%14s%15s%15s\n", "Body Name", "Mass/M☉", "Orbit/days", "Aphelion/AU", "Perihelion/AU", "Orbit/⊕ ratio");
 	for(int i=1; i<numberOfParticles; i++) {
-	    System.out.format("%10s%11.2e%13.5f%14.7f%15.7f%15.4f\n", particleArray[i].getLabel(),particleArray[i].getMass() , time/(angleDiff[i]/(2*Math.PI)) , aphelionArray[i], perihelionArray[i], time/(angleDiff[i]/(2*Math.PI))/365.25);
+	    System.out.format("%10s%11.2e%13.5f%14.7f%15.7f%15.4f\n", particleArray[i].getLabel(),particleArray[i].getMass() , time/(angleDiff[i]/(2*Math.PI)) , aphelionArray[i], perihelionArray[i], time/(angleDiff[i]/(2*Math.PI))/YEAR);
 	}
 
 	// Close the output file
