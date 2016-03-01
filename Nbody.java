@@ -145,12 +145,14 @@ public class Nbody {
 	/*
 	 * Determine initial conditions
 	 */
-	
-	for (int j=0; j<numberOfParticles; j++) {
-
 
 	    // Calculate aphelion/perihelion for t=0
 	    helion(particleArray, earthIndex, aphelionArray, perihelionArray);
+
+	    // Calc initial angles before the position update for orbit calculation
+	    orbitCounter(earthIndex, particleArray,  prevAngle, newAngle,  clockwise, angleDiff);
+	
+	for (int j=0; j<numberOfParticles; j++) {
 
 	    // Determine clockwise/anitclockwise orbits for each body
 	    if (Vector3D.vecCross(particleArray[j].getPosition(),particleArray[j].getVelocity()).getZ() > 0) {
@@ -159,8 +161,7 @@ public class Nbody {
 	    else { clockwise[j] = true; }
 	}    
 
-	    //    Calc initial angles before the position update for orbit calculation
-	    orbitCounter(earthIndex, particleArray,  prevAngle, newAngle,  clockwise, angleDiff);
+
 
 	/* End of initial conditions */
 
