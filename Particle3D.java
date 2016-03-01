@@ -9,7 +9,7 @@ import java.io.*;
  * @version "02/2016"
  *
  */
-public class Particle3D  {
+public class Particle3D {
 
     // Private properties
     private String label;

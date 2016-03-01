@@ -22,6 +22,11 @@ public class Nbody {
 
     public static void main (String[] argv) throws IOException {
 
+        if (argv.length != 3) {
+            System.err.println("Usage: java Nbody <particle_file> <parameter_file> <output_file>");
+            System.exit(-1);
+        }
+
 	// Open the input file containing particles
 	String particleFile = argv[0];
 
@@ -84,7 +89,7 @@ public class Nbody {
 	 */
 
 	// Open the second input file containing parameters: number of steps, size of timestep,
-	// initial time, print frequency
+	// initial time, print frequency, value of k, length of year in days
 	String paramFile = argv[1];
 
 	// Attach a scanner to the parameter input file
@@ -124,6 +129,8 @@ public class Nbody {
 	double newAngle[] = new double[numberOfParticles];
 	double prevAngle[] = new double[numberOfParticles];
 	double angleDiff[] = new double[numberOfParticles]; 
+	boolean clockwise[] = new boolean[numberOfParticles];
+	double separation;
 
 	// doubles for energy fluctuation calculation
 	double minEnergy = Particle3D.sysEnergy(particleArray);
@@ -138,30 +145,30 @@ public class Nbody {
 	/*
 	 * Determine initial conditions
 	 */
-	double separation;
-	boolean clockwise[] = new boolean[numberOfParticles];
+
 	for (int j=0; j<numberOfParticles; j++) {
-	// Calc initial angles before the position update for orbit calculation
-	    if (particleArray[j].getLabel().equals("Moon")) {
-		prevAngle[j] = Math.atan2(
-					  particleArray[earthIndex].getPosition().getY() - particleArray[j].getPosition().getY(), 
-					  particleArray[earthIndex].getPosition().getX() - particleArray[j].getPosition().getX());
-	    }
-	    else {
-		prevAngle[j] = Math.atan2(particleArray[j].getPosition().getY(), particleArray[j].getPosition().getX());
+	    // Calc initial angles before the position update for orbit calculation
+
+	    switch (particleArray[j].getLabel()) {
+	    case "Moon" : prevAngle[j] = Math.atan2(
+						    particleArray[earthIndex].getPosition().getY() - particleArray[j].getPosition().getY(), 
+						    particleArray[earthIndex].getPosition().getX() - particleArray[j].getPosition().getX());
+
+	    default : prevAngle[j] = Math.atan2(particleArray[j].getPosition().getY(), particleArray[j].getPosition().getX());
+
 	    }
 
-	// Calculate min/max distance for first time step
+	    // Calculate min/max distance for first time step
 	    if (particleArray[j].getLabel().equals("Moon")) {
-	    separation = Particle3D.pSep(particleArray[earthIndex], particleArray[j]).mag();
+		separation = Particle3D.pSep(particleArray[earthIndex], particleArray[j]).mag();
 	    }
 	    else {
-	    separation = Particle3D.pSep(particleArray[0], particleArray[j]).mag();
+		separation = Particle3D.pSep(particleArray[0], particleArray[j]).mag();
 	    }
 	    aphelionArray[j] = separation;
 	    perihelionArray[j] = separation;
 
-	// Determine clockwise/anitclockwise orbits for each body
+	    // Determine clockwise/anitclockwise orbits for each body
 	    if (Vector3D.vecCross(particleArray[j].getPosition(),particleArray[j].getVelocity()).getZ() > 0) {
 		clockwise[j] = false;
 	    }
