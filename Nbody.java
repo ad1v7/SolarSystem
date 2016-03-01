@@ -284,6 +284,14 @@ public class Nbody {
 	 * End of loop over timesteps
 	 */
 
+	double[] orbitTimeInDays = new double[numberOfParticles];
+	double[] numberOfOrbits = new double[numberOfParticles];
+
+	for (int i=0; i<numberOfParticles; i++) {
+	    orbitTimeInDays[i] = time/(angleDiff[i]/(2*Math.PI));
+	    numberOfOrbits[i] = angleDiff[i]/(2*Math.PI);
+	}
+
 	// Console output
 	System.out.printf("\nEnergy fluctuation: %1.2e\nThe ratio is %1.2e\n\n",
 			  maxEnergy-minEnergy, -(maxEnergy-minEnergy)/((minEnergy+maxEnergy)/2) );
@@ -293,8 +301,8 @@ public class Nbody {
 
 	for(int i=1; i<numberOfParticles; i++) {
 	    System.out.format("%10s%11.2e%13.5f%14.7f%15.7f%15.4f\n",
-			      particleArray[i].getLabel(),particleArray[i].getMass(), time/(angleDiff[i]/(2*Math.PI)),
-			      aphelionArray[i], perihelionArray[i], time/(angleDiff[i]/(2*Math.PI))/YEAR);
+			      particleArray[i].getLabel(),particleArray[i].getMass(), orbitTimeInDays[i],
+			      aphelionArray[i], perihelionArray[i], orbitTimeInDays[i]/YEAR);
 	}
 
 	System.out.println("\nKepler's 3rd Law verification:");
@@ -303,7 +311,7 @@ public class Nbody {
 	for (int i=1; i<numberOfParticles; i++) {
 
 	    System.out.printf("\n%10s%15.5e%15.5e", particleArray[i].getLabel(),
-			      Math.pow(time/(angleDiff[i]/(2*Math.PI))/YEAR,2), Math.pow((perihelionArray[i]+aphelionArray[i])/2,3));
+			      Math.pow(orbitTimeInDays[i]/YEAR,2), Math.pow((perihelionArray[i]+aphelionArray[i])/2,3));
 	}
 	System.out.println("\n");
 	// Close the output file
