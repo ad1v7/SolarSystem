@@ -60,29 +60,25 @@ public class Nbody {
 
 	// Calc total linear momentum and mass of the system
 	double systemMass = 0.0;
-	Vector3D totLinMom = new Vector3D();
-
+	
+	System.out.printf("\nUncorrected Total Linear Momentum: %1.2e M☉ AU/day\n", totLinMom(particleArray).mag());
+	
 	for (int i=0; i<numberOfParticles; i++) {
-	    totLinMom = Vector3D.vecAdd(totLinMom, particleArray[i].getVelocity().scalMul(particleArray[i].getMass()));
-	    systemMass += particleArray[i].getMass();
+systemMass += particleArray[i].getMass();
 	}
-	System.out.printf("\nUncorrected Total Linear Momentum: %1.2e M☉ AU/day\n", totLinMom.mag());
-	System.out.printf("Total Mass of The System: %1.4e M☉\n", systemMass);
 
 	// Calculate Centre of Mass velocity
-	Vector3D centreOfMass = new Vector3D(totLinMom.scalDiv(systemMass));
+	Vector3D centreOfMass = new Vector3D(totLinMom(particleArray).scalDiv(systemMass));
 
 	// Correct particle velocities by CoM velocity
 	for (int i=0; i<numberOfParticles; i++) {
 	    particleArray[i].setVelocity(Vector3D.vecSub(particleArray[i].getVelocity(), centreOfMass));
 	}
 
-	// Recalculate total linear momentum and print
-	totLinMom = new Vector3D();
-	for (int i=0; i<numberOfParticles; i++) {
-	    totLinMom = Vector3D.vecAdd(totLinMom, particleArray[i].getVelocity().scalMul(particleArray[i].getMass()));
-	}
-	System.out.printf("Corrected Total Linear Momentum: %1.2e M☉ AU/day\n", totLinMom.mag());
+	System.out.printf("Total Mass of The System: %1.4e M☉\n", systemMass);
+
+       // Recalculate total linear momentum and print
+       System.out.printf("Corrected Total Linear Momentum: %1.2e M☉ AU/day\n", totLinMom(particleArray).mag());
 
 	/* 
 	 * End of CoM correction
@@ -318,6 +314,14 @@ public class Nbody {
 	 */
        
     }
+
+    static Vector3D totLinMom(Particle3D[] particleArray) { 
+	Vector3D totLinMom = new Vector3D();
+for (int i=0; i<particleArray.length; i++) {
+	    totLinMom = Vector3D.vecAdd(totLinMom, particleArray[i].getVelocity().scalMul(particleArray[i].getMass()));
+}
+	    return totLinMom;
+} 
 
     static void helion(Particle3D[] particleArray, int earthIndex, double[] aphelionArray, double[] perihelionArray) {
 	double separation;
