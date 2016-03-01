@@ -306,12 +306,12 @@ public class Nbody {
 	}
 
 	System.out.println("\nKepler's 3rd Law verification:");
-	System.out.format("%10s%15s%15s",
-			  "Body Name", "Period ^2", "Semi-major ^3");
+	System.out.format("%10s%15s%15s%15s",
+			  "Body Name", "Period ^2", "Semi-major ^3", "# of orbits");
 	for (int i=1; i<numberOfParticles; i++) {
 
-	    System.out.printf("\n%10s%15.5e%15.5e", particleArray[i].getLabel(),
-			      Math.pow(orbitTimeInDays[i]/YEAR,2), Math.pow((perihelionArray[i]+aphelionArray[i])/2,3));
+	    System.out.printf("\n%10s%15.5e%15.5e%15.2e", particleArray[i].getLabel(),
+			      Math.pow(orbitTimeInDays[i]/YEAR,2), Math.pow((perihelionArray[i]+aphelionArray[i])/2,3), numberOfOrbits[i]);
 	}
 	System.out.println("\n");
 	// Close the output file
