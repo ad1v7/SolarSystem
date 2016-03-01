@@ -293,6 +293,8 @@ public class Nbody {
 	}
 
 	// Console output
+	System.out.printf("\nTotal run time: %.1f days which is %.2f years.", time, time/YEAR);
+
 	System.out.printf("\nEnergy fluctuation: %1.2e\nThe ratio is %1.2e\n\n",
 			  maxEnergy-minEnergy, -(maxEnergy-minEnergy)/((minEnergy+maxEnergy)/2) );
 
