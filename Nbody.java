@@ -145,18 +145,9 @@ public class Nbody {
 	/*
 	 * Determine initial conditions
 	 */
-
+	
 	for (int j=0; j<numberOfParticles; j++) {
-	    // Calc initial angles before the position update for orbit calculation
 
-	    switch (particleArray[j].getLabel()) {
-	    case "Moon" : prevAngle[j] = Math.atan2(
-						    particleArray[earthIndex].getPosition().getY() - particleArray[j].getPosition().getY(), 
-						    particleArray[earthIndex].getPosition().getX() - particleArray[j].getPosition().getX());
-
-	    default : prevAngle[j] = Math.atan2(particleArray[j].getPosition().getY(), particleArray[j].getPosition().getX());
-
-	    }
 
 	    // Calculate min/max distance for first time step
 	    if (particleArray[j].getLabel().equals("Moon")) {
@@ -173,7 +164,10 @@ public class Nbody {
 		clockwise[j] = false;
 	    }
 	    else { clockwise[j] = true; }
-	}
+	}    
+
+	    //    Calc initial angles before the position update for orbit calculation
+	    orbitCounter(earthIndex, particleArray,  prevAngle, newAngle,  clockwise, angleDiff);
 
 	/* End of initial conditions */
 
@@ -235,43 +229,9 @@ public class Nbody {
 	     * Start of orbit counter
 	     */
 
-	    for (int j=0; j<numberOfParticles; j++) {
-
-		if (particleArray[j].getLabel().equals("Moon")) {
-		    newAngle[j] = Math.atan2(
-					     particleArray[earthIndex].getPosition().getY() - particleArray[j].getPosition().getY(),
-					     particleArray[earthIndex].getPosition().getX() - particleArray[j].getPosition().getX());
-		}
-		else {
-		    newAngle[j] = Math.atan2(particleArray[j].getPosition().getY(), particleArray[j].getPosition().getX());
-		}
-
-		if (clockwise[j] == true) {
-		    if (Math.signum(prevAngle[j]) > Math.signum(newAngle[j])) {
-			angleDiff[j] += (Math.abs(newAngle[j]) + prevAngle[j]);
-		    }
-		    else if (Math.signum(prevAngle[j]) < Math.signum(newAngle[j])) {
-			angleDiff[j] += (2*Math.PI -(newAngle[j] - prevAngle[j]));
-		    }
-		    else {
-			angleDiff[j] += Math.abs(newAngle[j]-prevAngle[j]);
-		    }
-		}
-
-		// anticlockwise case
-		else {		  
-		    if (Math.signum(prevAngle[j]) < Math.signum(newAngle[j])) {
-			angleDiff[j] += (newAngle[j] + Math.abs(prevAngle[j]));
-		    }
-		    else if (Math.signum(prevAngle[j]) > Math.signum(newAngle[j])) {
-			angleDiff[j] += (2*Math.PI + (newAngle[j] - prevAngle[j]));
-		    }
-		    else {
-			angleDiff[j] += Math.abs(newAngle[j]-prevAngle[j]);
-		    }
-		}
-		prevAngle[j] = newAngle[j];
-	    }
+	    orbitCounter(earthIndex, particleArray,  prevAngle, newAngle,  clockwise, angleDiff);
+	    //	    prevAngle = newAngle;
+	    //	    System.out.printf("%f", newAngle[1]);
 
 	    /*
 	     * End of orbit counter
@@ -319,4 +279,55 @@ public class Nbody {
 	// Close the output file
 	output.close();
     }
+
+    static void orbitCounter(int earthIndex, Particle3D[] particleArray, double[] prevAngle, double[] newAngle, boolean[] clockwise, double[] angleDiff) {
+
+	/*
+	 * Start of orbit counter
+	 */
+
+	for (int j=0; j<particleArray.length; j++) {
+
+	    if (particleArray[j].getLabel().equals("Moon")) {
+		newAngle[j] = Math.atan2(
+					 particleArray[earthIndex].getPosition().getY() - particleArray[j].getPosition().getY(),
+					 particleArray[earthIndex].getPosition().getX() - particleArray[j].getPosition().getX());
+	    }
+	    else {
+		newAngle[j] = Math.atan2(particleArray[j].getPosition().getY(), particleArray[j].getPosition().getX());
+	    }
+
+	    if (clockwise[j] == true) {
+		if (Math.signum(prevAngle[j]) > Math.signum(newAngle[j])) {
+		    angleDiff[j] += (Math.abs(newAngle[j]) + prevAngle[j]);
+		}
+		else if (Math.signum(prevAngle[j]) < Math.signum(newAngle[j])) {
+		    angleDiff[j] += (2*Math.PI -(newAngle[j] - prevAngle[j]));
+		}
+		else {
+		    angleDiff[j] += Math.abs(newAngle[j]-prevAngle[j]);
+		}
+	    }
+
+	    // anticlockwise case
+	    else {		  
+		if (Math.signum(prevAngle[j]) < Math.signum(newAngle[j])) {
+		    angleDiff[j] += (newAngle[j] + Math.abs(prevAngle[j]));
+		}
+		else if (Math.signum(prevAngle[j]) > Math.signum(newAngle[j])) {
+		    angleDiff[j] += (2*Math.PI + (newAngle[j] - prevAngle[j]));
+		}
+		else {
+		    angleDiff[j] += Math.abs(newAngle[j]-prevAngle[j]);
+		}
+	    }
+	    prevAngle[j] = newAngle[j];
+	}
+
+	/*
+	 * End of orbit counter
+	 */
+       
+    }
+
 }
