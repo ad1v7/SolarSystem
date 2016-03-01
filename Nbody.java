@@ -145,15 +145,8 @@ systemMass += particleArray[i].getMass();
 	for (int j=0; j<numberOfParticles; j++) {
 
 
-	    // Calculate min/max distance for first time step
-	    if (particleArray[j].getLabel().equals("Moon")) {
-		separation = Particle3D.pSep(particleArray[earthIndex], particleArray[j]).mag();
-	    }
-	    else {
-		separation = Particle3D.pSep(particleArray[0], particleArray[j]).mag();
-	    }
-	    aphelionArray[j] = separation;
-	    perihelionArray[j] = separation;
+	    // Calculate aphelion/perihelion for t=0
+	    helion(particleArray, earthIndex, aphelionArray, perihelionArray);
 
 	    // Determine clockwise/anitclockwise orbits for each body
 	    if (Vector3D.vecCross(particleArray[j].getPosition(),particleArray[j].getVelocity()).getZ() > 0) {
@@ -200,16 +193,11 @@ systemMass += particleArray[i].getMass();
 	     */
 
 	    // Calculate aphelion and perihelion for each body in the simulation
-	    for (int j=1; j < numberOfParticles; j++) {
-		if (particleArray[j].getLabel().equals("Moon")) {
-		    separation = Particle3D.pSep(particleArray[earthIndex], particleArray[j]).mag();
-		}
-		else {
-		    separation = Particle3D.pSep(particleArray[0], particleArray[j]).mag();
-		}
-		if (aphelionArray[j] < separation) { aphelionArray[j] = separation; }
-		else if (perihelionArray[j] > separation) { perihelionArray[j] = separation; }
-	    }
+
+	    helion( particleArray,  earthIndex,  aphelionArray,  perihelionArray);
+	    ///
+
+
 
 	    // Prints every k-th position to VMD file
 	    // Calc min and max energy every k-th step to save on calc
@@ -333,5 +321,19 @@ for (int i=0; i<particleArray.length; i++) {
 }
 	    return totLinMom;
 } 
+
+    static void helion(Particle3D[] particleArray, int earthIndex, double[] aphelionArray, double[] perihelionArray) {
+	double separation;
+	    for (int j=1; j < particleArray.length; j++) {
+		if (particleArray[j].getLabel().equals("Moon")) {
+		    separation = Particle3D.pSep(particleArray[earthIndex], particleArray[j]).mag();
+		}
+		else {
+		    separation = Particle3D.pSep(particleArray[0], particleArray[j]).mag();
+		}
+		if (aphelionArray[j] < separation) { aphelionArray[j] = separation; }
+		else if (perihelionArray[j] > separation) { perihelionArray[j] = separation; }
+	    }
+    }
 
 }
