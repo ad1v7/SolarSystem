@@ -7,7 +7,7 @@
  *
  * @author M. Kirsz
  * @author R. Pruciak
- * @version "02/2016"
+ * @version "03/2016"
  *
  */
 
@@ -67,7 +67,7 @@ public class Nbody {
 	    systemMass += particleArray[i].getMass();
 	}
 	System.out.printf("\nUncorrected Total Linear Momentum: %1.2e M☉ AU/day\n", totLinMom.mag());
-	System.out.printf("Total Mass of The System: %1.8e M☉\n", systemMass);
+	System.out.printf("Total Mass of The System: %1.4e M☉\n", systemMass);
 
 	// Calculate Centre of Mass velocity
 	Vector3D centreOfMass = new Vector3D(totLinMom.scalDiv(systemMass));
@@ -120,7 +120,7 @@ public class Nbody {
 	// Calculate initial forces
 	Particle3D.updateForce(particleArray, currentForceArray);
 	
-	//Prints the initial positions to the output file
+	// Prints the initial positions to the output file
 	int stepNumber = 1;
 	output.printf(Particle3D.vmd(particleArray, stepNumber));
 	stepNumber++;
@@ -288,12 +288,6 @@ public class Nbody {
 	System.out.printf("\nEnergy fluctuation: %1.2e\nThe ratio is %1.2e\n\n",
 			  maxEnergy-minEnergy, -(maxEnergy-minEnergy)/((minEnergy+maxEnergy)/2) );
 
-	System.out.println("Kepler's 3rd Law verification:");
-	for (int i=1; i<numberOfParticles; i++) {
-	    System.out.printf("T^2= %f == %f = a^3\n",
-			      Math.pow(time/(angleDiff[i]/(2*Math.PI))/YEAR,2), Math.pow((perihelionArray[i]+aphelionArray[i])/2,3));
-	}
-
 	System.out.format("\n%10s%11s%13s%14s%15s%15s\n",
 			  "Body Name", "Mass/M☉", "Orbit/days", "Aphelion/AU", "Perihelion/AU", "Orbit/⊕ ratio");
 
@@ -303,6 +297,15 @@ public class Nbody {
 			      aphelionArray[i], perihelionArray[i], time/(angleDiff[i]/(2*Math.PI))/YEAR);
 	}
 
+	System.out.println("\nKepler's 3rd Law verification:");
+	System.out.format("%10s%15s%15s",
+			  "Body Name", "Period ^2", "Semi-major ^3");
+	for (int i=1; i<numberOfParticles; i++) {
+
+	    System.out.printf("\n%10s%15.5e%15.5e", particleArray[i].getLabel(),
+			      Math.pow(time/(angleDiff[i]/(2*Math.PI))/YEAR,2), Math.pow((perihelionArray[i]+aphelionArray[i])/2,3));
+	}
+	System.out.println("\n");
 	// Close the output file
 	output.close();
     }
