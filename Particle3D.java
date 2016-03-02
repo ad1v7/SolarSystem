@@ -17,7 +17,6 @@ public class Particle3D  {
     private Vector3D position;
     private Vector3D velocity;
 
-
     /* 
      * Constructors
      *

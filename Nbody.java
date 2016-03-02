@@ -29,7 +29,7 @@ public class Nbody {
 
 	// Open the input file containing particles
 	String particleFile = argv[0];
-
+	String expData = "expData.dat";
 	// Count number of particles in an input file
 	BufferedReader particleBuff = new BufferedReader(new FileReader(particleFile));
 	int numberOfParticles = 0;
@@ -37,6 +37,21 @@ public class Nbody {
 	    numberOfParticles++;
 	}
 	particleBuff.close();
+
+	// Comparision with exp data
+	BufferedReader expDataBuff = new BufferedReader(new FileReader(expData));
+	Scanner scanExpData = new Scanner(expDataBuff);
+	double[] expOrbit = new double[numberOfParticles];
+	double[] expAphelion = new double[numberOfParticles];
+	double[] expPerihelion = new double[numberOfParticles];
+	for (int i=0; scanExpData.hasNext(); i++) {
+
+	    expOrbit[i] =scanExpData.nextDouble();
+	    expAphelion[i] =scanExpData.nextDouble();
+	    expPerihelion[i] =scanExpData.nextDouble();
+
+	}
+
 
 	// Attach a scanner to the input file
 	particleBuff = new BufferedReader(new FileReader(particleFile));
@@ -73,7 +88,7 @@ public class Nbody {
 	    particleArray[i].setVelocity(Vector3D.vecSub(particleArray[i].getVelocity(), centreOfMass));
 	}
 
-	System.out.printf("Total Mass of The System: %1.4e M☉\n", systemMass);
+	System.out.printf("Total Mass of The System: %1.4f M☉\n", systemMass);
 
 	// Recalculate total linear momentum and print
 	System.out.printf("Corrected Total Linear Momentum: %1.2e M☉ AU/day\n", totLinMom(particleArray).mag());
@@ -138,19 +153,16 @@ public class Nbody {
 	 * Determine conditions at t = 0
 	 */
 
-	// Calculate aphelion/perihelion for t=0
-	helion(particleArray, earthIndex, aphelionArray, perihelionArray);
-
-	// Calc initial angles before the position update for orbit calculation
-	orbitCounter(earthIndex, particleArray,  prevAngle, newAngle,  clockwise, angleDiff);
-
 	// Determine clockwise/anitclockwise orbits for each body
 	for (int j=0; j<numberOfParticles; j++) {
 	    if (Vector3D.vecCross(particleArray[j].getPosition(),particleArray[j].getVelocity()).getZ() > 0) {
 		clockwise[j] = false;
 	    }
 	    else { clockwise[j] = true; }
-	}    
+	}
+
+	// Calc initial angles before the position update for orbit calculation
+	angles(earthIndex,  particleArray, prevAngle);
 
 	/* End of initial conditions */
 
@@ -158,6 +170,7 @@ public class Nbody {
 	 * Loop over times steps
 	 */
 
+	System.out.print("Percent completed:   0%");
 	for (int i=0; i<numberOfSteps; i++) {
 
 	    /*
@@ -187,20 +200,24 @@ public class Nbody {
 	     */
 
 	    // Calculate aphelion and perihelion for each body in the simulation
-	    helion( particleArray,  earthIndex,  aphelionArray,  perihelionArray);
+	    helion(particleArray, earthIndex, aphelionArray, perihelionArray);
 
 	    // Prints every k-th position to VMD file
 	    if (i % printFrequency == 0) {	   
 		output.printf(Particle3D.vmd(particleArray, stepNumber));
 
-	    // Calc min and max energy every k-th step to save on calc
+		// Calc min and max energy every k-th step to save on calc
 		energy = Particle3D.sysEnergy(particleArray);
 		if (minEnergy > energy) { minEnergy = energy;  }
-		if (maxEnergy < energy) { maxEnergy = energy;  }	
+		else if (maxEnergy < energy) { maxEnergy = energy;  }	
+
+		// Print % progress
+		System.out.printf("\b\b\b\b\b %3.0f%%", (i)/numberOfSteps*100 );
 	    }
 
 	    // Orbit Counter
-	    orbitCounter(earthIndex, particleArray,  prevAngle, newAngle,  clockwise, angleDiff);
+	    angles(earthIndex,  particleArray, newAngle);
+	    orbitCounter(particleArray,  prevAngle, newAngle,  clockwise, angleDiff);
 
 	    stepNumber++;
 	}
@@ -228,18 +245,21 @@ public class Nbody {
 			  "Body Name", "Mass/M☉", "Orbit/days", "Aphelion/AU", "Perihelion/AU", "Orbit/⊕ ratio");
 
 	for(int i=1; i<numberOfParticles; i++) {
-	    System.out.format("%10s%11.2e%13.5f%14.7f%15.7f%15.4f\n",
+	    System.out.format("%10s%11.2e%13.3f%14.6f%15.6f%15.4f\n",
 			      particleArray[i].getLabel(),particleArray[i].getMass(), orbitTimeInDays[i],
 			      aphelionArray[i], perihelionArray[i], orbitTimeInDays[i]/YEAR);
 	}
 
-	System.out.println("\nKepler's 3rd Law verification:");
-	System.out.format("%10s%15s%15s%15s",
-			  "Body Name", "Period ^2", "Semi-major ^3", "# of orbits");
+	System.out.println("\n Kepler's 3rd Law verification:               Comparision with experimental data");
+	System.out.format("%10s%11s%11s%12s%11s%12s%13s\n",
+			  "Body Name", "T^2", "a^3", "total", "orbits", "aphelion", "perihelion");
+	System.out.format("%10s%11s%11s%12s%11s%12s%13s",
+			  "", "", "", "orbits", "%", "%", "%");
 	for (int i=1; i<numberOfParticles; i++) {
 
-	    System.out.printf("\n%10s%15.5e%15.5e%15.2e", particleArray[i].getLabel(),
-			      Math.pow(orbitTimeInDays[i]/YEAR,2), Math.pow((perihelionArray[i]+aphelionArray[i])/2,3), numberOfOrbits[i]);
+	    System.out.printf("\n%10s%11.2e%11.2e%12.1f%11.3f%12.3f%13.3f", particleArray[i].getLabel(),
+			      Math.pow(orbitTimeInDays[i]/YEAR,2), Math.pow((perihelionArray[i]+aphelionArray[i])/2,3), numberOfOrbits[i],
+			      100*orbitTimeInDays[i]/expOrbit[i], 100*aphelionArray[i]/expAphelion[i], 100*perihelionArray[i]/expPerihelion[i]);
 	}
 	System.out.println("\n");
 	// Close the output file
@@ -250,19 +270,25 @@ public class Nbody {
      * Static Methods
      */
 
-    static void orbitCounter(int earthIndex, Particle3D[] particleArray, double[] prevAngle, double[] newAngle, boolean[] clockwise, double[] angleDiff) {
-
-	for (int j=0; j<particleArray.length; j++) {
+    // Angle between position vector and x axis
+    static void angles(int earthIndex, Particle3D[] particleArray,  double[] newAngle) {
+	for (int j=1; j<particleArray.length; j++) {
 
 	    if (particleArray[j].getLabel().equals("Moon")) {
-		newAngle[j] = Math.atan2(
-					 particleArray[earthIndex].getPosition().getY() - particleArray[j].getPosition().getY(),
+		newAngle[j] = Math.atan2(particleArray[earthIndex].getPosition().getY() - particleArray[j].getPosition().getY(),
 					 particleArray[earthIndex].getPosition().getX() - particleArray[j].getPosition().getX());
 	    }
-	    else {
-		newAngle[j] = Math.atan2(particleArray[j].getPosition().getY(), particleArray[j].getPosition().getX());
-	    }
+	    else { newAngle[j] = Math.atan2(particleArray[j].getPosition().getY(), particleArray[j].getPosition().getX()); }
+	    
+	}
+    }
 
+    // Orbit Counter method returns angular displacement at time t
+    static void orbitCounter(Particle3D[] particleArray, double[] prevAngle, double[] newAngle, boolean[] clockwise, double[] angleDiff) {
+
+	for (int j=1; j<particleArray.length; j++) {
+
+	    // clockwise case
 	    if (clockwise[j] == true) {
 		if (Math.signum(prevAngle[j]) > Math.signum(newAngle[j])) {
 		    angleDiff[j] += (Math.abs(newAngle[j]) + prevAngle[j]);
@@ -290,7 +316,7 @@ public class Nbody {
 	    prevAngle[j] = newAngle[j];
 	}
     }
-
+    // method to calculate total linear momentum
     static Vector3D totLinMom(Particle3D[] particleArray) { 
 	Vector3D totLinMom = new Vector3D();
 	for (int i=0; i<particleArray.length; i++) {
@@ -299,6 +325,7 @@ public class Nbody {
 	return totLinMom;
     } 
 
+    // method to calculate aphelion and perihelion
     static void helion(Particle3D[] particleArray, int earthIndex, double[] aphelionArray, double[] perihelionArray) {
 	double separation;
 	for (int j=1; j < particleArray.length; j++) {
