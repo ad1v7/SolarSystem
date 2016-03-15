@@ -250,21 +250,43 @@ public class Particle3D  {
 	return p;
     }
 
-    //// below need testing + description
-
+    /** Time integration support: evolve the position of all particles
+     * in an array according to dx = v * dt.
+     *
+     * @param dt a double representing the size of a time step
+     * @param p a Particle3D array containing all particles in a system
+     * @param f a Vector3D array of forces at n-th step
+     * @return String formatted for vmd
+     */
     public static void leapPosition(double dt, Particle3D[] p, Vector3D[] f) {	 
 	for (int i=0; i < p.length; i++) {	    
 	    p[i].leapPosition(dt,f[i]);
 	}
     }
 
-    public static void leapVelocity(double dt, Particle3D[] p, Vector3D[] currentForce, Vector3D[] newForce) {
+     /** Time integration support: evolve the velocity for all particles
+     * in an array according to dv = F * dt / m
+     *
+     * @param dt a double representing the size of a time step
+     * @param p a Particle3D array containing all particles in a system
+     * @param currentForce a Vector3D array of forces at n-th step
+     * @param newForce a Vector3D array of forces at n-th+1 step
+     * @return String formatted for vmd
+     */
+    public static void leapVelocity(double dt, Particle3D[] p,
+				    Vector3D[] currentForce, Vector3D[] newForce) {
 	for (int i=0; i < p.length; i++) {
 	    p[i].leapVelocity(dt,Vector3D.vecAdd(currentForce[i],newForce[i]).scalDiv(2));
 	}
     }
 
-    // do we need else statement?
+    /** Updates forces array based on current position
+     * of particles in a system
+     *
+     * @param p a Particle3D array containing all particles in a system
+     * @param f a Vector3D array of forces
+     * @return String formatted for vmd
+     */
     public static void updateForce(Particle3D[] p, Vector3D[] f) {
 	for (int i=0; i < p.length; i++) {
 	    for (int j=0; j < p.length; j++) {		  
@@ -274,7 +296,15 @@ public class Particle3D  {
 	    }
 	}  
     }
-
+ 
+    /** Method formats output suitable for vmd
+     * Returns a string which contains positions of all particles
+     * in a sytem at particular step
+     *
+     * @param p a Particle3D array containing all particles in a system
+     * @param stepNumber an int representing stepNumber
+     * @return String formatted for vmd
+     */
     public static String vmd(Particle3D[] p, int stepNumber) {
 	String s1;
       	String s2 = ""; // so compiler doesn't complain
@@ -285,7 +315,12 @@ public class Particle3D  {
 	return s1+s2;
     }
 
-    // suppose to calculate total energy of the system
+    /** Total energy of the system of N particles
+     * as a sum of kinetic and potential energies
+     *
+     * @param p1 a Particle3D array containing all particles in a system
+     * @return double representing total energy of all particles
+     */
     public static double sysEnergy(Particle3D[] p) {
 	double energy = 0;
 	for (int i=0; i<p.length; i++) {
@@ -296,5 +331,4 @@ public class Particle3D  {
 	}
 	return energy;
     }
-
 }
