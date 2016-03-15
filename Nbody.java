@@ -240,9 +240,9 @@ public class Nbody {
 
 	// Console output
 	System.out.printf("\nTotal run time: %.1f days which is %.2f years.", time, time/YEAR);
-	// 
-	System.out.printf("\nEnergy fluctuation: %1.2e\nThe ratio is %1.2e\n\n",
-			  maxEnergy-minEnergy, -(maxEnergy-minEnergy)/((minEnergy+maxEnergy)/2) );
+
+	System.out.printf("\nEnergy fluctuation: %1.2e%s of the total system energy.\n",
+			  -(maxEnergy-minEnergy)/((minEnergy+maxEnergy)/2)*100, "%");
 
 	System.out.format("\n%10s%11s%13s%14s%15s%15s\n",
 			  "Body Name", "Mass/M☉", "Orbit/days", "Aphelion/AU", "Perihelion/AU", "Orbit/⊕ ratio");
