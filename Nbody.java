@@ -29,7 +29,7 @@ public class Nbody {
 
 	// Open the input file containing particles
 	String particleFile = argv[0];
-	String expData = "expData.dat";
+	String expData = "expData.dat"; // file contains experimental data; used for comparision
 	// Count number of particles in an input file
 	BufferedReader particleBuff = new BufferedReader(new FileReader(particleFile));
 	int numberOfParticles = 0;
@@ -142,7 +142,7 @@ public class Nbody {
 
 	// doubles for energy fluctuation calculation
 	double minEnergy = Particle3D.sysEnergy(particleArray);
-	double maxEnergy = Particle3D.sysEnergy(particleArray);
+	double maxEnergy = minEnergy;
 	double energy;
 
 	// Arrays of doubles to store values of aphelion and perihelion for each body
@@ -157,8 +157,9 @@ public class Nbody {
 	for (int j=0; j<numberOfParticles; j++) {
 	    if (Vector3D.vecCross(particleArray[j].getPosition(),particleArray[j].getVelocity()).getZ() > 0) {
 		clockwise[j] = false;
+	    } else {
+		clockwise[j] = true;
 	    }
-	    else { clockwise[j] = true; }
 	}
 
 	// Calc initial angles before the position update for orbit calculation
@@ -237,7 +238,7 @@ public class Nbody {
 
 	// Console output
 	System.out.printf("\nTotal run time: %.1f days which is %.2f years.", time, time/YEAR);
-
+	// 
 	System.out.printf("\nEnergy fluctuation: %1.2e\nThe ratio is %1.2e\n\n",
 			  maxEnergy-minEnergy, -(maxEnergy-minEnergy)/((minEnergy+maxEnergy)/2) );
 
@@ -277,9 +278,9 @@ public class Nbody {
 	    if (particleArray[j].getLabel().equals("Moon")) {
 		newAngle[j] = Math.atan2(particleArray[earthIndex].getPosition().getY() - particleArray[j].getPosition().getY(),
 					 particleArray[earthIndex].getPosition().getX() - particleArray[j].getPosition().getX());
+	    } else {
+		newAngle[j] = Math.atan2(particleArray[j].getPosition().getY(), particleArray[j].getPosition().getX());
 	    }
-	    else { newAngle[j] = Math.atan2(particleArray[j].getPosition().getY(), particleArray[j].getPosition().getX()); }
-	    
 	}
     }
 
@@ -292,11 +293,9 @@ public class Nbody {
 	    if (clockwise[j] == true) {
 		if (Math.signum(prevAngle[j]) > Math.signum(newAngle[j])) {
 		    angleDiff[j] += (Math.abs(newAngle[j]) + prevAngle[j]);
-		}
-		else if (Math.signum(prevAngle[j]) < Math.signum(newAngle[j])) {
+		} else if (Math.signum(prevAngle[j]) < Math.signum(newAngle[j])) {
 		    angleDiff[j] += (2*Math.PI -(newAngle[j] - prevAngle[j]));
-		}
-		else {
+		} else {
 		    angleDiff[j] += Math.abs(newAngle[j]-prevAngle[j]);
 		}
 	    }
@@ -305,17 +304,16 @@ public class Nbody {
 	    else {		  
 		if (Math.signum(prevAngle[j]) < Math.signum(newAngle[j])) {
 		    angleDiff[j] += (newAngle[j] + Math.abs(prevAngle[j]));
-		}
-		else if (Math.signum(prevAngle[j]) > Math.signum(newAngle[j])) {
+		} else if (Math.signum(prevAngle[j]) > Math.signum(newAngle[j])) {
 		    angleDiff[j] += (2*Math.PI + (newAngle[j] - prevAngle[j]));
-		}
-		else {
+		} else {
 		    angleDiff[j] += Math.abs(newAngle[j]-prevAngle[j]);
 		}
 	    }
 	    prevAngle[j] = newAngle[j];
 	}
     }
+
     // method to calculate total linear momentum
     static Vector3D totLinMom(Particle3D[] particleArray) { 
 	Vector3D totLinMom = new Vector3D();
