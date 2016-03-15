@@ -114,7 +114,9 @@ public class Nbody {
 
 	// Opens the output file
 	String outFile = argv[2];
+	String outFileEnergy = argv[2]+".energy"; // output file for energy fluctuations
         PrintWriter output = new PrintWriter(new FileWriter(outFile));
+        PrintWriter outputEnergy = new PrintWriter(new FileWriter(outFile));
 
 	// Set up arrays which store forces
 	Vector3D currentForceArray[] = new Vector3D[numberOfParticles];
