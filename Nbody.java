@@ -44,14 +44,16 @@ public class Nbody {
 	double[] expOrbit = new double[numberOfParticles];
 	double[] expAphelion = new double[numberOfParticles];
 	double[] expPerihelion = new double[numberOfParticles];
-	for (int i=0; scanExpData.hasNext(); i++) {
+	
+	for (int i=0; scanExpData.hasNext() && i<numberOfParticles; i++) {
 
 	    expOrbit[i] =scanExpData.nextDouble();
 	    expAphelion[i] =scanExpData.nextDouble();
 	    expPerihelion[i] =scanExpData.nextDouble();
 
 	}
-
+	scanExpData.close();
+	expDataBuff.close();
 
 	// Attach a scanner to the input file
 	particleBuff = new BufferedReader(new FileReader(particleFile));
@@ -116,7 +118,7 @@ public class Nbody {
 	String outFile = argv[2];
 	String outFileEnergy = argv[2]+".energy"; // output file for energy fluctuations
         PrintWriter output = new PrintWriter(new FileWriter(outFile));
-        PrintWriter outputEnergy = new PrintWriter(new FileWriter(outFile));
+        PrintWriter outputEnergy = new PrintWriter(new FileWriter(outFileEnergy));
 
 	// Set up arrays which store forces
 	Vector3D currentForceArray[] = new Vector3D[numberOfParticles];
@@ -195,8 +197,6 @@ public class Nbody {
 		newForceArray[j] = new Vector3D();
 	    }
 
-	    // Increase the time
-	    time = time + stepSize;
 
 	    /*
 	     *  end of the Verlet Algorithm
@@ -211,6 +211,8 @@ public class Nbody {
 
 		// Calc min and max energy every k-th step to save on calc
 		energy = Particle3D.sysEnergy(particleArray);
+		outputEnergy.printf("%.0f %1.15e\n",time, energy);
+
 		if (minEnergy > energy) { minEnergy = energy;  }
 		else if (maxEnergy < energy) { maxEnergy = energy;  }	
 
@@ -223,6 +225,9 @@ public class Nbody {
 	    orbitCounter(particleArray,  prevAngle, newAngle,  clockwise, angleDiff);
 
 	    stepNumber++;
+
+	    // Increase the time
+	    time = time + stepSize;
 	}
 
 	/*
@@ -238,7 +243,7 @@ public class Nbody {
 	    numberOfOrbits[i] = angleDiff[i]/(2*Math.PI);
 	}
 
-	// Console output
+	// Console output	
 	System.out.printf("\nTotal run time: %.1f days which is %.2f years.", time, time/YEAR);
 
 	System.out.printf("\nEnergy fluctuation: %1.2e%s of the total system energy.\n",
@@ -259,14 +264,20 @@ public class Nbody {
 	System.out.format("%10s%11s%11s%12s%11s%12s%13s",
 			  "", "", "", "orbits", "%", "%", "%");
 	for (int i=1; i<numberOfParticles; i++) {
-
+	    if (particleArray[i].getLabel().equals("Moon")) {
+	    System.out.printf("\n%10s%11s%11s%12.1f%11.3f%12.3f%13.3f", particleArray[i].getLabel(),
+			      "----", "----", numberOfOrbits[i],
+			      100*orbitTimeInDays[i]/expOrbit[i], 100*aphelionArray[i]/expAphelion[i], 100*perihelionArray[i]/expPerihelion[i]);
+	    } else {
 	    System.out.printf("\n%10s%11.2e%11.2e%12.1f%11.3f%12.3f%13.3f", particleArray[i].getLabel(),
 			      Math.pow(orbitTimeInDays[i]/YEAR,2), Math.pow((perihelionArray[i]+aphelionArray[i])/2,3), numberOfOrbits[i],
 			      100*orbitTimeInDays[i]/expOrbit[i], 100*aphelionArray[i]/expAphelion[i], 100*perihelionArray[i]/expPerihelion[i]);
+	    }
 	}
 	System.out.println("\n");
 	// Close the output file
 	output.close();
+	outputEnergy.close();
     }
 
     /*

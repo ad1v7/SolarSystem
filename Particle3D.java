@@ -310,7 +310,7 @@ public class Particle3D  {
       	String s2 = ""; // so compiler doesn't complain
 	s1 =	String.format("%d\nPoint = %d\n", p.length, stepNumber);
 	for (int j=0; j < p.length; j++) {
-	    s2 = s2 + String.format("%s\n", p[j]);
+	    s2 = s2 + String.format("%10s\n", p[j]);
 	}   
 	return s1+s2;
     }
